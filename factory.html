@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CS Factory &amp; QC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap">
+<style>
+
+/* Layout: navy top bar + left sidebar (same shell as CS DATA SYSTEM), work area on the right; sidebar becomes a chip row on phones */
+:root{color-scheme:light;
+  --navy:#0c2034;--navy2:#17406a;--cream:#E1E0CC;
+  --bg:#EEF1F5;--card:#ffffff;--ink:#16212e;--mut:#5b6b7d;--line:#DDE3EA;--soft:#F4F7FA;
+  --accent:#1F4E78;--accent-soft:#e6eef6;
+  --ok:#1d7a43;--ok-soft:#e3f5ea;--warn:#a35f00;--warn-soft:#fdf1dc;--bad:#b42318;--bad-soft:#fde4e2;--info:#3d5ccf;--info-soft:#e8ecfb;
+  --shadow:0 1px 2px rgba(12,32,52,.06),0 6px 18px rgba(12,32,52,.06);
+  --f-display:Archivo,Sarabun,"Segoe UI",sans-serif;--f-body:Sarabun,Tahoma,"Segoe UI",sans-serif;
+  --sbw:226px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14.5px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:radial-gradient(120% 300% at 0% 0%,var(--navy2) 0%,var(--navy) 55%,#081522 100%);color:var(--cream);display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top h1{font-family:var(--f-display);font-size:18px;margin:0;font-weight:600;letter-spacing:.01em;white-space:nowrap}
+.top .sub{color:rgba(225,224,204,.6);font-size:13px}
+.top .link{display:flex;align-items:center;gap:6px;font-size:12.5px;color:rgba(225,224,204,.85);background:rgba(225,224,204,.08);border:1px solid rgba(225,224,204,.2);border-radius:99px;padding:3px 10px}
+.top .link i{width:8px;height:8px;border-radius:50%;background:#5fcf8e;box-shadow:0 0 0 3px rgba(95,207,142,.2)}
+.top .sp{flex:1}
+.role{display:flex;gap:4px;background:rgba(225,224,204,.08);border-radius:99px;padding:3px}
+.role button{border:0;background:none;color:rgba(225,224,204,.75);border-radius:99px;padding:4px 12px;cursor:pointer;font-size:13px}
+.role button.on{background:var(--cream);color:#0a0a0a;font-weight:600}
+.shell{display:flex;min-height:calc(100vh - 56px)}
+nav.side{width:var(--sbw);flex:none;background:var(--navy);padding:12px 10px 24px;position:sticky;top:56px;align-self:flex-start;height:calc(100vh - 56px);overflow-y:auto}
+nav.side .g{font-size:11px;letter-spacing:.07em;color:rgba(225,224,204,.45);padding:12px 12px 4px}
+nav.side button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:rgba(225,224,204,.78);text-align:left;padding:9px 12px;border-radius:12px;cursor:pointer;font-size:14px}
+nav.side button:hover{background:rgba(225,224,204,.08);color:var(--cream)}
+nav.side button.on{background:var(--cream);color:#0a0a0a;font-weight:600}
+nav.side svg{width:19px;height:19px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.side .n{margin-left:auto;font-size:11.5px;background:rgba(225,224,204,.15);border-radius:99px;padding:0 8px;font-variant-numeric:tabular-nums}
+nav.side button.on .n{background:#0c2034;color:var(--cream)}
+nav.side .n.hot{background:#c2410c;color:#fff}
+main{flex:1;min-width:0;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1280px;margin:0 auto;display:grid;gap:18px}
+.ph{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.ph h2{font-family:var(--f-display);font-size:26px;margin:0;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+.ph p{margin:2px 0 0;color:var(--mut)}
+.ph .sp{flex:1}
+.demo{font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:99px;padding:2px 10px;white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);min-width:0}
+.card h3{margin:0 0 10px;font-size:15.5px;font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;cursor:pointer;text-align:left;display:grid;gap:2px;box-shadow:var(--shadow);border-top:4px solid var(--line)}
+.tile:hover{border-color:var(--accent)}
+.tile .l{color:var(--mut);font-size:13px}
+.tile .v{font-family:var(--f-display);font-size:32px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile .v small{font-size:14px;font-weight:500;color:var(--mut);margin-left:4px;font-family:var(--f-body)}
+.tile .s{font-size:12.5px;color:var(--mut)}
+.tile.bad{border-top-color:var(--bad)}.tile.bad .v{color:var(--bad)}
+.tile.warn{border-top-color:var(--warn)}.tile.warn .v{color:var(--warn)}
+.tile.info{border-top-color:var(--info)}
+.tile.ok{border-top-color:var(--ok)}
+.g2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px}
+@media(max-width:980px){.g2{grid-template-columns:1fr}}
+.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:190px;padding-top:18px}
+.bar{display:grid;grid-template-rows:auto 1fr auto;height:100%;text-align:center;cursor:pointer;border:0;background:none;padding:0}
+.bar .c{font-weight:700;font-variant-numeric:tabular-nums;font-size:13px}
+.bar .t{display:flex;align-items:flex-end;justify-content:center}
+.bar .t i{display:block;width:70%;max-width:46px;background:var(--accent);border-radius:8px 8px 3px 3px;min-height:3px}
+.bar.today .t i{background:#c2410c}
+.bar .d{font-size:12px;color:var(--mut);margin-top:6px;line-height:1.25}
+.bar.today .d{color:var(--ink);font-weight:700}
+.pipe{display:flex;gap:6px;flex-wrap:wrap}
+.pipe button{flex:1 1 120px;border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;display:grid;gap:2px}
+.pipe button b{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}
+.pipe button span{font-size:12.5px;color:var(--mut)}
+.alist{display:grid;gap:6px}
+.arow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--soft);cursor:pointer;border:0;text-align:left;width:100%}
+.arow:hover{background:var(--accent-soft)}
+.arow .x{min-width:0}.arow .x b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arow .x small{color:var(--mut)}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:1px 9px;font-size:12px;font-weight:600;white-space:nowrap}
+.p-pick{background:var(--info-soft);color:var(--info)}
+.p-recv{background:var(--accent-soft);color:var(--accent)}
+.p-rep{background:var(--warn-soft);color:var(--warn)}
+.p-qc{background:#efe7fb;color:#6b3fb8}
+.p-ready{background:var(--ok-soft);color:var(--ok)}
+.p-done{background:var(--soft);color:var(--mut);border:1px solid var(--line)}
+.p-bad{background:var(--bad-soft);color:var(--bad)}
+.p-doc{background:var(--warn-soft);color:var(--warn)}
+.p-docok{background:var(--ok-soft);color:var(--ok)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:99px;padding:7px 16px;cursor:pointer;font-weight:600;font-size:13.5px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--accent)}
+.btn.ok{background:var(--ok);border-color:var(--ok)}
+.btn.bad{background:transparent;border-color:var(--bad);color:var(--bad)}
+.btn.sm{padding:4px 12px;font-size:12.5px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.day{display:grid;gap:10px}
+.dayh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dayh h3{margin:0;font-family:var(--f-display);font-size:19px;font-weight:600}
+.dayh .cnt{font-family:var(--f-display);font-weight:700;font-size:15px;color:var(--accent)}
+.rows{display:grid;gap:8px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.row .who{min-width:0;cursor:pointer}
+.row .who b{font-weight:700}
+.row .who .m{color:var(--mut);font-size:13px}
+.row .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.board{display:grid;grid-template-columns:repeat(4,minmax(230px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:10px;display:grid;gap:8px;align-content:start;min-width:0}
+.colh{display:flex;align-items:center;gap:8px;padding:2px 4px 4px}
+.colh b{font-size:14.5px}.colh span{margin-left:auto;font-family:var(--f-display);font-weight:700;color:var(--mut)}
+.kc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:6px;box-shadow:var(--shadow)}
+.kc .top2{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.kc .svo{font-family:var(--f-display);font-weight:600;font-size:13px;color:var(--accent);cursor:pointer;border:0;background:none;padding:0}
+.kc .nm{font-weight:700;cursor:pointer}
+.kc .m{color:var(--mut);font-size:12.5px}
+.kc .age{margin-left:auto;font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}
+.kc .age.late{color:var(--bad);font-weight:700}
+.kc .acts{display:flex;gap:6px;flex-wrap:wrap}
+.empty{color:var(--mut);font-size:13px;text-align:center;padding:16px 8px;border:1px dashed var(--line);border-radius:12px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{background:var(--accent);color:#fff;text-align:left;font-weight:600;padding:9px 10px;white-space:nowrap}
+td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr{cursor:pointer}tbody tr:hover td{background:var(--soft)}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tb input,.tb select,.fld input,.fld select,.fld textarea{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:7px 10px;min-width:0}
+.tb input{flex:1 1 220px}
+/* drawer */
+.ov{position:fixed;inset:0;background:rgba(8,21,34,.5);z-index:20;display:flex;justify-content:flex-end}
+.dr{width:min(640px,100%);height:100%;background:var(--bg);overflow-y:auto;display:grid;align-content:start;gap:14px;padding-block:calc(16px + env(safe-area-inset-top,0px)) calc(28px + env(safe-area-inset-bottom,0px));padding-left:18px;padding-right:max(18px,env(safe-area-inset-right,0px))}
+.drh{display:flex;align-items:flex-start;gap:10px}
+.drh h2{margin:0;font-family:var(--f-display);font-size:22px;font-weight:600}
+.drh .x{margin-left:auto;border:0;background:var(--card);border-radius:99px;width:34px;height:34px;cursor:pointer;font-size:18px;flex:none}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px}
+.kv div{min-width:0}.kv small{display:block;color:var(--mut);font-size:12px}
+.steps{display:flex;gap:0;overflow-x:auto;padding:4px 0}
+.st{flex:1 0 82px;display:grid;justify-items:center;gap:4px;text-align:center;font-size:11.5px;color:var(--mut);position:relative}
+.st::before{content:"";position:absolute;top:10px;left:-50%;right:50%;height:3px;background:var(--line);z-index:0}
+.st:first-child::before{display:none}
+.st i{width:22px;height:22px;border-radius:50%;background:var(--card);border:3px solid var(--line);z-index:1}
+.st.done i{background:var(--ok);border-color:var(--ok)}.st.done::before{background:var(--ok)}
+.st.cur i{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}.st.cur{color:var(--ink);font-weight:700}.st.cur::before{background:var(--ok)}
+.sync{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;background:var(--accent-soft);border-radius:12px;padding:10px 12px;font-size:13px}
+.sync b{font-size:14px}
+.sync svg{width:26px;height:26px;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.gal button{border:1px solid var(--line);border-radius:10px;padding:0;overflow:hidden;cursor:zoom-in;background:var(--soft);display:grid;text-align:left}
+.gal img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.gal .cap{font-size:11.5px;padding:4px 6px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gal .doc{aspect-ratio:4/3;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;color:var(--bad);background:var(--bad-soft)}
+.gtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.gtabs button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:3px 11px;cursor:pointer;font-size:12.5px}
+.gtabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.log{display:grid;gap:0}
+.log div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+.log div:first-child{border-top:0}
+.log time{color:var(--mut);font-variant-numeric:tabular-nums;font-size:12px}
+.log .by{color:var(--mut);font-size:12px}
+/* modal */
+.md{position:fixed;inset:0;z-index:30;background:rgba(8,21,34,.55);display:grid;place-items:center;padding:16px}
+.mdb{background:var(--card);border-radius:18px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow-y:auto;display:grid;gap:12px;padding:18px}
+.mdb h3{margin:0;font-family:var(--f-display);font-size:19px;font-weight:600}
+.fld{display:grid;gap:4px}.fld label{font-size:12.5px;color:var(--mut);font-weight:600}
+.chk{display:grid;gap:6px}
+.chk label{display:flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.up{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap}
+.thumbs img,.thumbs .doc{width:72px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.thumbs .doc{display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--bad);background:var(--bad-soft)}
+.mf{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.err{color:var(--bad);font-size:13px}
+.lb{position:fixed;inset:0;z-index:40;background:rgba(5,10,16,.97);display:grid;grid-template-rows:1fr auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.lb img{max-width:100%;max-height:100%;margin:auto;display:block;border-radius:8px;object-fit:contain;min-height:0}
+.lb .lbi{min-height:0;display:grid}
+.lb .bar2{display:flex;gap:10px;align-items:center;justify-content:center;color:#E1E0CC;padding-top:10px;flex-wrap:wrap}
+.lb button{border:1px solid rgba(225,224,204,.4);background:none;color:#E1E0CC;border-radius:99px;padding:6px 14px;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--cream);padding:9px 16px;border-radius:99px;z-index:50;font-size:13.5px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.mapc{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--card);display:grid;gap:6px;align-content:start}
+.mapc .who{font-size:11.5px;color:var(--mut);letter-spacing:.04em}
+.mapc .a1{font-size:12.5px;border-top:1px dashed var(--line);padding-top:6px;color:var(--mut)}
+.mapc .a1 b{color:var(--ink)}
+.note{font-size:13px;color:var(--mut)}
+.hb{display:grid;gap:10px;padding-top:4px}
+.hbr{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr) 2.2em;gap:10px;align-items:center;font-size:13.5px}
+.hbl{color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbt{height:14px;background:var(--soft);border-radius:7px;overflow:hidden}
+.hbt i{display:block;height:100%;background:var(--accent);border-radius:7px;min-width:3px}
+.hbr b{text-align:right;font-variant-numeric:tabular-nums}
+.note b{color:var(--ink)}
+/* mobile: bottom tab bar, one list at a time, big tap targets */
+.bnav,.seg,.mlist,.dr-foot,.sheet{display:none}
+@media(max-width:820px){
+  body{font-size:15px}
+  .shell{display:block;min-height:0}
+  nav.side{display:none}
+  .top{gap:8px;padding-block:8px}
+  .top h1{font-size:16px}
+  .top .sub,.top .link,.top .sp{display:none}
+  .role{margin-left:auto}
+  .role button{padding:5px 10px;font-size:12.5px}
+  main{padding-block:14px calc(92px + env(safe-area-inset-bottom,0px))}
+  .wrap{gap:14px}
+  .ph h2{font-size:22px}.ph p{font-size:13.5px}
+  .ph .demo{order:-1}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tile{padding:12px;border-radius:14px}
+  .tile .v{font-size:28px}.tile .l{font-size:12.5px;line-height:1.3}.tile .s{font-size:12px}
+  .card{padding:14px;border-radius:14px}
+  .bars{gap:4px;height:160px}
+  .pipe button{flex:1 1 40%}
+  .row{grid-template-columns:1fr;padding:12px}
+  .row .acts{justify-content:stretch}
+  .row .acts .btn{flex:1;padding:11px 14px;font-size:14.5px}
+  .row .acts .pill{align-self:center}
+  .board,.tw.desk{display:none}
+  .seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .seg button{justify-content:center;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font-size:14px;cursor:pointer;display:flex;gap:6px;align-items:center;white-space:nowrap}
+  .seg button b{font-variant-numeric:tabular-nums}
+  .seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .mlist{display:grid;gap:10px}
+  .mlist .kc{padding:12px;gap:8px}
+  .mlist .kc .acts .btn{flex:1;padding:11px 14px;font-size:14.5px}
+  .kv{grid-template-columns:1fr 1fr;gap:10px 12px}
+  .bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -4px 18px rgba(12,32,52,.08);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+  .bnav button{border:0;background:none;display:grid;justify-items:center;gap:2px;padding:8px 2px 7px;font-size:11.5px;color:var(--mut);cursor:pointer;position:relative;min-height:58px}
+  .bnav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .bnav button.on{color:var(--accent);font-weight:700}
+  .bnav button.on::before{content:"";position:absolute;top:0;left:28%;right:28%;height:3px;border-radius:0 0 3px 3px;background:var(--accent)}
+  .bnav .n{position:absolute;top:4px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:#c2410c;color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 5px;font-variant-numeric:tabular-nums}
+  .sheet{display:block;position:fixed;inset:0;z-index:25;background:rgba(8,21,34,.45)}
+  .sheet .in{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:20px 20px 0 0;padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));display:grid;gap:6px}
+  .sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--line);justify-self:center;margin-bottom:6px}
+  .sheet button.it{display:flex;align-items:center;gap:12px;border:0;background:var(--soft);border-radius:14px;padding:14px;font-size:15.5px;text-align:left;cursor:pointer}
+  .sheet button.it svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .sheet button.it .n{margin-left:auto;background:#c2410c;color:#fff;border-radius:99px;padding:0 9px;font-size:12.5px;font-weight:700}
+  .dr{width:100%;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px))}
+  .only-desk{display:none!important}
+  .acts-top:empty{display:none!important}
+  .dr-foot{display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--card);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+  .dr-foot .btn{flex:1;padding:12px 10px;font-size:15px}
+  .dr-foot .more{flex:none}
+  .drh h2{font-size:19px}
+  .md{place-items:end stretch;padding:0}
+  .mdb{width:100%;border-radius:20px 20px 0 0;max-height:92vh;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+  .mf .btn{flex:1;padding:12px;font-size:15px}
+  .chk label{padding:11px 12px}
+  .fld input,.fld select,.fld textarea,.tb input,.tb select{padding:11px 12px;font-size:16px}
+  .toast{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+  .gal{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* เพิ่มสำหรับระบบจริง */
+[hidden]{display:none!important}
+.top .who{font-size:12.5px;color:rgba(225,224,204,.8);white-space:nowrap}
+.top .fbtn{display:flex;align-items:center;gap:6px;border:1px solid rgba(225,224,204,.45);background:rgba(225,224,204,.08);color:#E1E0CC;border-radius:99px;padding:5px 12px;cursor:pointer;font-size:13px}
+.fres{display:grid;gap:10px;margin:10px 0 18px}
+.fr{background:#fff;border:1px solid #DCE3EA;border-left:5px solid #86b6e6;border-radius:14px;padding:12px 14px;display:grid;gap:6px}
+.fr.qc{border-left-color:#e0952f}.fr.main{border-left-color:#9aa6b2}.fr.out{border-left-color:#5fcf8e}.fr.late{border-left-color:#d93025}
+.fr .h{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}.fr .h b{font-size:16px;color:#0c2034}
+.fr .loc{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:13.5px;background:#F5F7FA;border-radius:10px;padding:8px 10px}
+.fr .loc span:nth-child(odd){color:#6a7480;white-space:nowrap}.fr .loc b{color:#0c2034}
+.fsteps2{display:flex;gap:3px;margin-top:2px}.fsteps2 i{flex:1;height:5px;border-radius:3px;background:#E3E8EE}.fsteps2 i.d{background:#9fc6e8}.fsteps2 i.c{background:#1F4E78}
+.fr .acts2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.fr .lock{font-size:12.5px;color:#6a7480}
+.fhint{font-size:12.5px;color:#6a7480;margin-top:4px}
+.top .lo{border:1px solid rgba(225,224,204,.45);background:none;color:#E1E0CC;border-radius:99px;padding:4px 12px;cursor:pointer;font-size:12.5px}
+nav.side a.sx{display:flex;align-items:center;gap:10px;margin-top:14px;padding:9px 12px;border-radius:12px;border:1px dashed rgba(225,224,204,.3);color:rgba(225,224,204,.85);text-decoration:none;font-size:13.5px}
+nav.side a.sx:hover{background:rgba(225,224,204,.08)}
+nav.side a.sx svg{width:19px;height:19px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gal .th{display:block;aspect-ratio:4/3;background:var(--soft);overflow:hidden}
+.gal .th img{width:100%;height:100%;object-fit:cover;display:block}
+.gal .th .doc{width:100%;height:100%}
+.ph0{display:grid;place-items:center;height:100%;color:var(--mut);font-size:12px}
+.thumbs .tw2{position:relative;display:inline-block}
+.thumbs .tw2 button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:var(--bad);color:#fff;cursor:pointer;font-size:13px;line-height:22px;padding:0}
+.lb iframe{width:100%;height:100%;border:0;background:#fff;border-radius:8px}
+.lb a{color:#E1E0CC;border:1px solid rgba(225,224,204,.4);border-radius:99px;padding:6px 14px;text-decoration:none}
+.lb button.del{border-color:#ff8a80;color:#ff8a80}
+.admz{border-color:var(--bad-soft)}
+.admz h3{color:var(--bad)}
+.sheet a.it{display:flex;align-items:center;gap:12px;border-radius:14px;padding:14px;font-size:15.5px;background:var(--soft);color:var(--ink);text-decoration:none}
+#login{min-height:100vh;display:grid;place-items:center;padding:16px;background:radial-gradient(120% 120% at 0% 0%,#17406a 0%,#0c2034 55%,#081522 100%)}
+#login .box{background:var(--card);border-radius:20px;padding:22px;width:min(380px,100%);display:grid;gap:12px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+#login h1{margin:0;font-family:var(--f-display);font-size:22px}
+#login p{margin:0;color:var(--mut);font-size:13.5px}
+#login input{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 12px;font-size:16px;width:100%}
+#login .btn{padding:11px;font-size:15px}
+#lgMsg{color:var(--bad);font-size:13.5px;min-height:1em}
+@media(max-width:820px){.top .who{display:none}.top .lo{display:none}.top .fbtn span{display:none}.top .fbtn{padding:6px 9px}}
+
+/* โทนสีเดียวกับเว็บหลัก (CS DATA SYSTEM): ส่วนหัว + เมนูซ้ายสีน้ำเงินเข้ม พื้นที่ทำงานสีเทาอ่อน */
+.role{align-items:center}
+.role .mlb{font-size:12px;color:rgba(225,224,204,.6);padding:0 6px 0 8px;white-space:nowrap}
+.card,.tile,.kc{box-shadow:0 1px 2px rgba(12,32,52,.04),0 4px 14px rgba(12,32,52,.04)}
+.card,.tile{border-color:#DDE3EA}
+@media(max-width:820px){.top .role{margin-left:auto}.role .mlb{display:none}}
+</style>
+</head><body>
+<div id="login" hidden><form class="box" onsubmit="event.preventDefault();doLogin()"><h1>CS Factory &amp; QC</h1><p>เว็บแอปโรงงาน · ใช้รหัสพนักงานและ PIN เดียวกับ CS DATA SYSTEM</p>
+<input id="lgCode" placeholder="รหัสพนักงาน" autocomplete="username" autocapitalize="characters"><input id="lgPin" type="password" inputmode="numeric" placeholder="PIN" autocomplete="current-password">
+<div id="lgPin2Row" hidden><input id="lgPin2" type="password" inputmode="numeric" placeholder="ยืนยัน PIN อีกครั้ง"></div>
+<div id="lgMsg"></div><button class="btn" id="lgBtn" type="submit">เข้าสู่ระบบ</button></form></div>
+<div id="app" hidden>
+<header class="top">
+  <h1>CS Factory &amp; QC</h1>
+  <span class="sub">เว็บแอปโรงงาน · CS โรงงาน / QC</span>
+  <span class="sp"></span>
+  <button class="fbtn" type="button" onclick="goFind()" aria-label="ค้นหาที่นอนทุกกระบวนการ"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span>ค้นหา</span></button>
+  <div class="role" id="modeSw" hidden></div><span class="who" id="who"></span><button class="lo" type="button" onclick="logout()">ออกจากระบบ</button>
+</header>
+<div class="shell">
+  <nav class="side" id="side" aria-label="เมนูหลัก"></nav>
+  <main><div class="wrap" id="view"></div></main>
+</div>
+<nav class="bnav" id="bnav" aria-label="เมนู"></nav>
+</div>
+<div id="layer"></div>
+<script>
+'use strict';
+/* ---------- การเชื่อมต่อ (ใช้ token เดียวกับเว็บหลัก) ---------- */
+/*TRANSPORT*/
+const API_URL='https://script.google.com/macros/s/AKfycbzGmXR5dNe7f9gK23jcMPt-CzSTc6m1AjO5OD7qM4SvfpkF2vmUVwytQkoxpwIdfyo/exec';
+/* เรียก Apps Script: POST text/plain (ไม่ต้อง preflight) · Google ตอบกลับพร้อม CORS ให้ทุกโดเมน */
+async function apiPost(body){let r;try{r=await fetch(API_URL,{method:'POST',body:JSON.stringify(body),redirect:'follow'});}catch(e){throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ — ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');}
+  const j=await r.json().catch(()=>({error:'เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง (HTTP '+r.status+')'}));if(j.error)throw new Error(j.error);return j.data;}
+const PG_BASE=location.href.replace(/[?#].*$/,'').replace(/[^/]*$/,'');
+/* ลิงก์ระหว่างหน้า ให้ชี้ไปหน้าบน GitHub Pages แทนลิงก์ Apps Script */
+function pgFix(fn,r){try{if(!r||typeof r!=='object')return r;
+  if(fn==='getBootstrap'&&r.factory)r.factory.url=PG_BASE+'factory.html';
+  if(fn==='facBoot'&&r.app1Url)r.app1Url=PG_BASE;
+  if(fn==='refundInfo')r.formUrl=PG_BASE+'refund.html';}catch(e){}return r;}
+const TP={
+  getTok(){try{return localStorage.getItem('cs_tok')||window.__tok||'';}catch(e){return window.__tok||'';}},
+  setTok(v){window.__tok=v||'';try{v?localStorage.setItem('cs_tok',v):localStorage.removeItem('cs_tok');}catch(e){}},
+  async gs(fn,...a){if(fn==='login')return apiPost({k:'login',p:a[0]||{}});if(fn==='logout')return apiPost({k:'logout',tok:a[0]||''});throw new Error('ไม่รองรับ '+fn);},
+  async call(fn,a){return pgFix(fn,await apiPost({k:'api',tok:TP.getTok(),fn:fn,args:a||[]}));}
+};
+/*/TRANSPORT*/
+function call(fn,...a){return TP.call(fn,a).catch(e=>{if(/\bLOGIN\b/.test(e.message)){showLogin();throw new Error('กรุณาเข้าสู่ระบบ');}throw e;});}
+function $(s){return document.querySelector(s)}
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* ---------- ขั้นตอน ---------- */
+const STAGES=[
+  {k:'PICKUP',t:'รอเก็บสินค้า',cls:'p-pick',a1:'รอเก็บสินค้า',who:'เว็บหลัก (CS)'},
+  {k:'RECV',t:'รับเข้าโรงงาน · รอส่งซ่อม',sh:'รับเข้าแล้ว',cls:'p-recv',a1:'สินค้าถึงโรงงานแล้ว',who:'CS โรงงาน'},
+  {k:'WAIT',t:'ส่งซ่อมแล้ว · รอ QC รับเข้า',sh:'ส่งซ่อมแล้ว',cls:'p-qc',a1:'กำลังซ่อม',who:'CS โรงงาน → QC'},
+  {k:'REPAIR',t:'กำลังซ่อม',cls:'p-rep',a1:'กำลังซ่อม',who:'QC'},
+  {k:'BACK',t:'ซ่อมเสร็จ · รอ CS รับกลับ',sh:'ซ่อมเสร็จ',cls:'p-ready',a1:'กำลังซ่อม',who:'QC → CS โรงงาน'},
+  {k:'READY',t:'CS รับกลับแล้ว · พร้อมส่งคืน',sh:'พร้อมส่งคืน',cls:'p-ready',a1:'ซ่อมเสร็จ-รอนัดส่ง',who:'CS โรงงาน → เว็บหลัก'},
+  {k:'OUT',t:'ส่งออกจากโรงงานแล้ว',sh:'ส่งออกแล้ว',cls:'p-done',a1:'นัดส่งแล้ว / ส่งคืนแล้ว',who:'เว็บหลัก (CS)'}
+];
+const SI=Object.fromEntries(STAGES.map((s,i)=>[s.k,i]));
+const ST=k=>STAGES[SI[k]]||STAGES[0];
+const ICO={
+  dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+  inb:'<path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M5 13 7 5h10l2 8v6H5z"/>',
+  send:'<path d="M4 12h12M12 6l6 6-6 6"/><path d="M20 4v16"/>',
+  back:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+  wait:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2.5h6"/>',
+  cs:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.9 1.9 0 0 0 2.7 2.7l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.3-.5-.5-2.3z"/>',
+  doc:'<path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5M8.5 13h7M8.5 17h5"/>',
+  all:'<path d="M4 6h16M4 12h16M4 18h10"/>',
+  truck:'<path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+  more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+  cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  flow:'<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="12" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8.5 6H13a3 3 0 0 1 3 3v.5M8.5 18H13a3 3 0 0 0 3-3v-.5"/>'
+};
+const PAGES=[
+  ['dcs','dash','ภาพรวม CS โรงงาน','ภาพรวม','CS โรงงาน','CS'],
+  ['inb','inb','รับที่นอนเข้า','รับเข้า','CS โรงงาน','CS'],
+  ['send','send','ส่งซ่อม','ส่งซ่อม','CS โรงงาน','CS'],
+  ['back','back','รับกลับที่นอนซ่อมเสร็จ','รับกลับ','CS โรงงาน','CS'],
+  ['deliv','truck','ที่นอนนัดส่งลูกค้า','นัดส่ง','CS โรงงาน','CS'],
+  ['dqc','dash','ภาพรวม QC','ภาพรวม','QC','QC'],
+  ['wait','wait','ที่นอนรอซ่อม (รับเข้ามาแล้ว)','รอซ่อม','QC','QC'],
+  ['repair','cs','ที่นอนซ่อม','ซ่อม','QC','QC'],
+  ['doc','doc','รอเอกสารการตรวจสอบ','เอกสาร','QC','QC'],
+  ['all','all','เคสทั้งหมด / ค้นหา','ทั้งหมด','ข้อมูล',''],
+  ['flow','flow','ผังสถานะ & วิธีใช้','ผังสถานะ','ข้อมูล','']
+];
+const PG=Object.fromEntries(PAGES.map(p=>[p[0],p]));
+/* ---------- วันที่ ---------- */
+const pad=n=>String(n).padStart(2,'0');
+const T0=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const d0=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x};
+const dayDiff=(a,b)=>Math.round((d0(b)-d0(a))/864e5);
+const pd=s=>{if(!s)return null;const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);return m?new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)):null;};
+const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const dOff=n=>new Date(T0().getTime()+n*864e5);
+const fd=d=>d?pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear():'-';
+const fdt=d=>d?fd(d)+' '+pad(d.getHours())+':'+pad(d.getMinutes()):'-';
+const WD=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+const dayLabel=d=>{const n=dayDiff(T0(),d);return n===0?'วันนี้':n===1?'พรุ่งนี้':n===-1?'เมื่อวาน':WD[d.getDay()]+' '+fd(d)};
+/* ---------- สถานะ ---------- */
+let DELIV=[];let B=null,P=null,CASES=[],VIEW='',OPEN=null,DET=null,GTAB='ALL',Q='',FST='',LOADED=0;
+let MODE='CS';
+const BOTH=()=>!!(P&&P['CS'].see&&P['QC'].see);
+const sideOn=s=>!!(P&&P[s]&&P[s]['see']&&(!BOTH()||MODE===s));
+const canE=side=>!!(P&&P[side]&&P[side].edit&&sideOn(side));
+const canDel=side=>side?!!(P&&P[side].del&&sideOn(side)):(canDel('CS')||canDel('QC'));
+function setMode(m){if(!BOTH()||MODE===m)return;MODE=m;try{localStorage.setItem('fac_mode',m);}catch(e){}closeDrawer();
+  const map={dcs:'dqc',inb:'wait',send:'wait',back:'repair',dqc:'dcs',wait:'inb',repair:'send',doc:'back'};
+  if(!pagesAllowed().some(p=>p[0]===VIEW))VIEW=map[VIEW]||pagesAllowed()[0][0];render();window.scrollTo(0,0);toast('สลับเป็นมุมมอง '+(m==='CS'?'CS โรงงาน':'QC'));}
+const dis=side=>canE(side)?'':`disabled title="${P&&P[side]&&P[side].see?'บัญชีนี้ดูอย่างเดียว':'สำหรับ '+(side==='CS'?'CS โรงงาน':'QC')}"`;
+function pagesAllowed(){return PAGES.filter(p=>!p[5]||sideOn(p[5]));}
+function bottomKeys(){return sideOn('CS')?['dcs','inb','send','back','deliv']:['dqc','wait','repair','doc'];}
+function toCase(c){return Object.assign({},c,{pickupD:pd(c.pickup),recvD:pd(c.recvAt),sentD:pd(c.sentAt),startD:pd(c.startAt),doneD:pd(c.doneAt),backD:pd(c.backAt)});}
+/* ---------- metrics ---------- */
+const repAge=c=>dayDiff(c.sentD||T0(),T0());
+function M(){const by=k=>CASES.filter(c=>c.stage===k);const pick=by('PICKUP');const t=T0();
+  const inRep=CASES.filter(c=>c.stage==='WAIT'||c.stage==='REPAIR');
+  return {pick,today:pick.filter(c=>c.pickupD&&dayDiff(t,c.pickupD)===0),tom:pick.filter(c=>c.pickupD&&dayDiff(t,c.pickupD)===1),late:pick.filter(c=>c.pickupD&&dayDiff(t,c.pickupD)<0),
+    recv:by('RECV'),wait:by('WAIT'),rep:by('REPAIR'),inRep,repLate:inRep.filter(c=>repAge(c)>B.late),back:by('BACK'),ready:by('READY'),
+    docTodo:CASES.filter(c=>c.docReq&&c.doneD&&['BACK','READY','OUT'].includes(c.stage)&&c.docSt==='none'),docIssued:CASES.filter(c=>c.docReq&&c.docSt==='issued'),
+    docPend:CASES.filter(c=>c.docReq&&c.doneD&&['BACK','READY','OUT'].includes(c.stage)&&c.docSt!=='sent')};}
+function badge(k,m){return ({deliv:DELIV.filter(x=>x.deliv===dkey(T0())&&!x.shipped).length,inb:m.today.length,send:m.recv.length,back:m.back.length,wait:m.wait.length,repair:m.repLate.length,doc:k==='doc'?(sideOn('QC')?m.docTodo.length:0)+(sideOn('CS')?m.docIssued.length:0):0})[k]||0;}
+/* ---------- โครงหน้า ---------- */
+function renderShell(){const m=M();
+  $('#who').textContent=B.user.display+' · '+B.user.role;
+  const sw=$('#modeSw');sw.hidden=!BOTH();if(BOTH())sw.innerHTML=`<span class="mlb">มุมมอง</span>${[['CS','CS โรงงาน'],['QC','QC']].map(x=>`<button type="button" class="${MODE===x[0]?'on':''}" onclick="setMode('${x[0]}')">${x[1]}</button>`).join('')}`;
+  let g='',side='';pagesAllowed().forEach(p=>{if(p[4]!==g){g=p[4];side+=`<div class="g">${g}</div>`;}const n=badge(p[0],m);
+    side+=`<button type="button" class="${VIEW===p[0]?'on':''}" onclick="go('${p[0]}')"><svg viewBox="0 0 24 24">${ICO[p[1]]}</svg><span>${p[2]}</span>${n?`<b class="n ${['inb','repair','doc'].includes(p[0])?'hot':''}">${n}</b>`:''}</button>`;});
+  if(B.app1Url)side+=`<a class="sx" href="${esc(B.app1Url)}" target="_top"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/></svg><span>กลับเว็บหลัก (CS DATA SYSTEM)</span></a>`;
+  $('#side').innerHTML=side;
+  const bk=bottomKeys(),rest=pagesAllowed().filter(p=>!bk.includes(p[0])).map(p=>p[0]);
+  const bt=(k,ic,t,n,on,fn)=>`<button type="button" class="${on?'on':''}" onclick="${fn}" aria-label="${t}"><svg viewBox="0 0 24 24">${ICO[ic]}</svg>${t}${n?`<b class="n">${n}</b>`:''}</button>`;
+  $('#bnav').style.gridTemplateColumns='repeat('+(bk.length+1)+',minmax(0,1fr))';
+  $('#bnav').innerHTML=bk.map(k=>bt(k,PG[k][1],PG[k][3],badge(k,m),VIEW===k,`go('${k}')`)).join('')+bt('more','more','เพิ่มเติม',rest.reduce((a,k)=>a+badge(k,m),0),rest.includes(VIEW),'moreSheet()');}
+function moreSheet(){const m=M();const rest=pagesAllowed().filter(p=>!bottomKeys().includes(p[0]));
+  $('#layer').insertAdjacentHTML('beforeend',`<div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()"><div class="in"><span class="grab"></span>${rest.map(p=>{const n=badge(p[0],m);
+    return `<button type="button" class="it" onclick="closeSheet();go('${p[0]}')"><svg viewBox="0 0 24 24">${ICO[p[1]]}</svg>${p[2]}${p[4]&&p[4]!=='ข้อมูล'?`<small class="note">· ${p[4]}</small>`:''}${n?`<span class="n">${n}</span>`:''}</button>`}).join('')}
+    ${B.app1Url?`<a class="it" href="${esc(B.app1Url)}" target="_top">↩ กลับเว็บหลัก (CS DATA SYSTEM)</a>`:''}<button type="button" class="it" onclick="closeSheet();logout()">ออกจากระบบ</button></div></div>`);}
+function closeSheet(){const e=$('#sheet');if(e)e.remove();}
+function go(k){if(!pagesAllowed().some(p=>p[0]===k))k=pagesAllowed()[0][0];VIEW=k;try{sessionStorage.setItem('fac_view',k);}catch(e){}render();window.scrollTo(0,0);}
+function render(){if(!B)return;renderShell();const f={deliv:vDeliv,dcs:vDashCS,dqc:vDashQC,inb:vInb,send:vSend,back:vBack,wait:vWait,repair:vRepair,doc:vDoc,all:vAll,flow:vFlow}[VIEW];$('#view').innerHTML=f();}
+const pill=c=>{const s=ST(c.stage);return `<span class="pill ${s.cls}">${s.t}</span>`};
+const docPill=c=>!c.docReq?'':c.docSt==='sent'?'<span class="pill p-docok">ส่งเอกสารแล้ว</span>':c.docSt==='issued'?'<span class="pill p-doc">เอกสารรอส่งลูกค้า</span>':'<span class="pill p-doc">ลูกค้าขอเอกสาร</span>';
+const rwPill=c=>c.rework?`<span class="pill p-bad">ซ่อมซ้ำ ×${c.rework}</span>`:'';
+const head=(t,p,extra)=>`<div class="ph"><div><h2>${t}</h2><p>${p}</p></div><span class="sp"></span>${extra||''}<button class="btn g sm" onclick="reload(true)">รีเฟรช</button></div>`;
+const prod=c=>[c.brand,c.model,c.size].filter(Boolean).join(' ');
+function rowCase(c,acts){return `<div class="row"><div class="who" onclick="openCase('${esc(c.key)}')"><b>${esc(c.svo)}</b> · ${esc(c.name)} ${docPill(c)} ${rwPill(c)}<div class="m">${esc(prod(c))}${c.prob?' · '+esc(c.prob):''}${c.line?' · '+esc(c.line):''}</div></div><div class="acts">${acts}</div></div>`;}
+const section=(title,cnt,unit,list,f,emptyTxt,color)=>`<div class="card day"><div class="dayh"><h3${color?` style="color:${color}"`:''}>${title}</h3><span class="cnt"${color?` style="color:${color}"`:''}>${cnt} ${unit}</span></div><div class="rows">${list.length?list.map(f).join(''):`<div class="empty">${emptyTxt}</div>`}</div></div>`;
+const tile=(cls,go_,l,v,u,sx)=>`<button class="tile ${cls}" onclick="go('${go_}')"><span class="l">${l}</span><span class="v">${v}<small>${u}</small></span><span class="s">${sx}</span></button>`;
+const alertCard=(title,alerts)=>`<div class="card"><h3>${title} (${alerts.length})</h3><div class="alist">${alerts.length?alerts.map(a=>`<button type="button" class="arow" onclick="openCase('${esc(a.c.key)}')"><span class="pill ${a.lv}">${a.tag}</span><span class="x"><b>${esc(a.c.svo)} · ${esc(a.c.name)}</b><small>${esc(a.why)}</small></span><span class="pill ${ST(a.c.stage).cls}">${ST(a.c.stage).sh||ST(a.c.stage).t}</span></button>`).join(''):'<div class="empty">ไม่มีงานค้าง</div>'}</div></div>`;
+const hbars=rows=>{const mx=Math.max(1,...rows.map(r=>r[1]));return `<div class="hb">${rows.map(r=>`<div class="hbr"><span class="hbl">${esc(r[0])}</span><span class="hbt"><i style="width:${r[1]/mx*100}%;${r[2]?'background:'+r[2]:''}"></i></span><b>${r[1]}</b></div>`).join('')}</div>`;};
+/* ---------- ภาพรวม CS ---------- */
+function vDashCS(){const m=M();const t=T0();
+  const days=[...Array(7)].map((_,i)=>{const d=dOff(i);return {d,n:m.pick.filter(c=>c.pickupD&&dayDiff(t,c.pickupD)===i).length}});
+  const mx=Math.max(1,...days.map(x=>x.n));
+  const alerts=[].concat(
+    m.recv.filter(c=>c.recvD&&dayDiff(c.recvD,t)>=1).map(c=>({c,lv:'p-doc',tag:'รับเข้าแล้ว ยังไม่ส่งซ่อม',why:`รับเข้า ${fd(c.recvD)} · ${dayDiff(c.recvD,t)} วัน`})),
+    m.back.filter(c=>c.doneD&&dayDiff(c.doneD,t)>=1).map(c=>({c,lv:'p-doc',tag:'ซ่อมเสร็จ ยังไม่รับกลับ',why:`QC ส่งคืน ${fd(c.doneD)} · ${dayDiff(c.doneD,t)} วัน`})),
+    m.docIssued.map(c=>({c,lv:'p-doc',tag:'เอกสารรอส่งลูกค้า',why:'QC ออกเอกสารผลตรวจแล้ว'})),
+    m.ready.filter(c=>c.backD&&dayDiff(c.backD,t)>3).map(c=>({c,lv:'p-done',tag:'รอนัดส่งเกิน 3 วัน',why:`รับกลับ ${fd(c.backD)} · แจ้ง CS เว็บหลัก`})));
+  return head('ภาพรวม CS โรงงาน','รับที่นอนเข้า · ส่งซ่อม · รับกลับ · ส่งเอกสารให้ลูกค้า')+
+  `<div class="tiles">
+    ${tile('info','inb','ที่นอนเข้าโรงงานวันนี้',m.today.length,'ชิ้น','พรุ่งนี้ '+m.tom.length+' ชิ้น')}
+    ${(()=>{const td=dkey(t),tm=dkey(dOff(1)),a=DELIV.filter(x=>x.deliv===td);return tile('info','deliv','นัดส่งลูกค้าวันนี้',a.length,'ชิ้น','ส่งออกแล้ว '+a.filter(x=>x.shipped).length+' · พรุ่งนี้ '+DELIV.filter(x=>x.deliv===tm).length);})()}
+    ${tile('','inb','นัดเก็บ 7 วันข้างหน้า',m.pick.filter(c=>c.pickupD&&dayDiff(t,c.pickupD)<7).length,'ชิ้น','ตามวันนัดเก็บใน SVO')}
+    ${tile(m.recv.length?'warn':'','send','รับเข้าแล้ว รอส่งซ่อม',m.recv.length,'หลัง','ส่งต่อให้ฝ่าย QC')}
+    ${tile(m.back.length?'warn':'ok','back','ซ่อมเสร็จ รอรับกลับ',m.back.length,'หลัง','QC ตรวจผ่านแล้ว')}
+    ${tile('ok','back','รับกลับแล้ว พร้อมส่งคืน',m.ready.length,'หลัง','รอเว็บหลักนัดส่ง')}
+    ${tile(m.docIssued.length?'warn':'','doc','เอกสารรอส่งลูกค้า',m.docIssued.length,'ฉบับ','QC ออกเอกสารแล้ว')}
+  </div>
+  <div class="g2">
+    <div class="card"><h3>ที่นอนจะเข้าโรงงาน 7 วันข้างหน้า</h3><div class="note">นับจาก "วันนัดเก็บสินค้า" ใน SVO ที่สถานะ รอเก็บสินค้า</div>
+      <div class="bars">${days.map((x,i)=>`<button type="button" class="bar ${i===0?'today':''}" onclick="go('inb')" aria-label="${dayLabel(x.d)} ${x.n} ชิ้น"><span class="c">${x.n}</span><span class="t"><i style="height:${x.n/mx*100}%"></i></span><span class="d">${i===0?'วันนี้':i===1?'พรุ่งนี้':WD[x.d.getDay()]}<br>${pad(x.d.getDate())}/${pad(x.d.getMonth()+1)}</span></button>`).join('')}</div></div>
+    <div class="card"><h3>งานในมือ CS โรงงาน</h3><div class="pipe">${[['รอรับเข้าวันนี้','inb',m.today.length],['รอส่งซ่อม','send',m.recv.length],['รอรับกลับ','back',m.back.length],['พร้อมส่งคืน','back',m.ready.length]].map(x=>`<button type="button" onclick="go('${x[1]}')"><b>${x[2]}</b><span>${x[0]}</span></button>`).join('')}</div>
+      <div class="note" style="margin-top:10px">ที่นอนที่ส่งซ่อมแล้วดูได้ในหน้า "ส่งซ่อม" · รายละเอียดงานซ่อมอยู่ในภาพรวม QC</div></div>
+  </div>`+alertCard('CS ต้องตามงาน',alerts);}
+/* ---------- ภาพรวม QC ---------- */
+function vDashQC(){const m=M();const t=T0();
+  const pass7=CASES.filter(c=>c.doneD&&['BACK','READY','OUT'].includes(c.stage)&&dayDiff(c.doneD,t)<7);
+  const rw=CASES.filter(c=>c.rework&&(c.stage==='REPAIR'||c.stage==='WAIT'));
+  const lines=(B.lines||[]).map(l=>[l,m.rep.filter(c=>c.line===l).length]);
+  const buckets=[['0–7 วัน',m.inRep.filter(c=>repAge(c)<=7).length,''],['8–'+B.late+' วัน',m.inRep.filter(c=>repAge(c)>7&&repAge(c)<=B.late).length,'var(--warn)'],['เกิน '+B.late+' วัน',m.repLate.length,'var(--bad)']];
+  const alerts=[].concat(
+    m.repLate.map(c=>({c,lv:'p-bad',tag:'ค้างซ่อมเกิน '+B.late+' วัน',why:`ส่งซ่อม ${fd(c.sentD)} · ${repAge(c)} วัน${c.line?' · '+c.line:''}`})),
+    m.wait.filter(c=>c.sentD&&dayDiff(c.sentD,t)>=1).map(c=>({c,lv:'p-doc',tag:'ยังไม่รับเข้าซ่อม',why:`CS ส่งมา ${fd(c.sentD)} · ${dayDiff(c.sentD,t)} วัน`})),
+    rw.map(c=>({c,lv:'p-bad',tag:'ซ่อมซ้ำ ×'+c.rework,why:ST(c.stage).t})),
+    m.docTodo.map(c=>({c,lv:'p-doc',tag:'รอออกเอกสาร',why:`ตรวจผ่าน ${fd(c.doneD)} · ลูกค้าขอเอกสารผลตรวจสอบ`})));
+  return head('ภาพรวม QC','รับเข้าซ่อม · ซ่อม · ตรวจ QC · ออกเอกสารผลตรวจ')+
+  `<div class="tiles">
+    ${tile(m.wait.length?'warn':'','wait','ที่นอนรอซ่อม',m.wait.length,'หลัง','CS ส่งมาแล้ว รอรับเข้าซ่อม')}
+    ${tile('info','repair','กำลังซ่อม',m.rep.length,'หลัง','แยกตามไลน์ซ่อมด้านล่าง')}
+    ${tile(m.repLate.length?'bad':'','repair','ค้างซ่อมเกิน '+B.late+' วัน',m.repLate.length,'หลัง','นับจากวันที่ส่งซ่อม')}
+    ${tile(rw.length?'bad':'','repair','ซ่อมซ้ำ (ตรวจไม่ผ่าน)',rw.length,'หลัง','กำลังแก้ไขรอบใหม่')}
+    ${tile('ok','repair','ตรวจผ่าน 7 วันล่าสุด',pass7.length,'หลัง','ส่งคืน CS โรงงานแล้ว')}
+    ${tile(m.docTodo.length?'warn':'','doc','รอออกเอกสารตรวจสอบ',m.docTodo.length,'ฉบับ','ลูกค้าขอเอกสารผลตรวจ')}
+  </div>
+  <div class="g2">
+    <div class="card"><h3>กำลังซ่อม แยกตามไลน์ซ่อม</h3>${hbars(lines)}</div>
+    <div class="card"><h3>อายุงานซ่อม (รอซ่อม + กำลังซ่อม)</h3>${hbars(buckets)}<div class="note" style="margin-top:10px">นับวันจาก "วันที่ส่งซ่อม" · เกณฑ์เดียวกับเว็บหลัก</div></div>
+  </div>`+alertCard('QC ต้องตามงาน',alerts);}
+/* ---------- CS โรงงาน ---------- */
+function vInb(){const m=M();const t=T0();const groups={};m.pick.slice().sort((a,b)=>a.pickupD-b.pickupD).forEach(c=>{const k=dayDiff(t,c.pickupD)<0?'late':c.pickupD.getTime();(groups[k]=groups[k]||[]).push(c)});
+  const btn=c=>`<button class="btn sm" ${dis('CS')} onclick="actRecv('${esc(c.key)}')">รับที่นอนเรียบร้อย</button>`;
+  let h=head('รับที่นอนเข้า','รายการตาม "วันนัดเก็บสินค้า" จาก SVO · กดรับเมื่อลงจากขนส่ง พร้อมถ่ายรูปสภาพ');
+  if(canE('CS'))h+=`<div class="card"><h3>รับเข้าเคสที่ไม่มีในรายการ</h3><div class="note">เช่น ไม่ได้ลงวันนัดเก็บ เลยวันนัดเก็บ หรือเคสที่อยู่ในโรงงานก่อนเริ่มใช้ระบบ · ค้นด้วยเลขที่ SVO / ชื่อ / เบอร์ · ถ้าเคสอยู่ขั้นอื่นแล้ว ระบบจะบอกว่าอยู่ที่ไหน</div>
+    <div class="tb" style="margin-top:8px"><input id="sq" type="search" placeholder="เช่น SVO2611-0012 หรือ ชื่อลูกค้า" onkeydown="if(event.key==='Enter')doSearch()"><button class="btn sm" onclick="doSearch()">ค้นหา</button></div><div id="sres" class="rows" style="margin-top:8px"></div></div>`;
+  Object.keys(groups).filter(k=>k!=='late').forEach(k=>{const d=new Date(+k);h+=section(dayLabel(d)+(dayDiff(t,d)<=1?` <span class="note">${fd(d)}</span>`:''),groups[k].length,'ชิ้น',groups[k],c=>rowCase(c,btn(c)),'');});
+  if(!m.pick.length)h+='<div class="empty">ไม่มีที่นอนรอเก็บ</div>';
+  return h;}
+let SRES=[];
+function doSearch(){const q=(($('#sq')||{}).value||'').trim();if(q.length<2){toast('พิมพ์อย่างน้อย 2 ตัวอักษร');return;}
+  $('#sres').innerHTML='<div class="note">กำลังค้นหาทั้งระบบ…</div>';
+  /* ค้นข้ามทุกกระบวนการ: ถ้ายังไม่เข้าโรงงานจะมีปุ่มรับเข้า · ถ้าอยู่ขั้นอื่นแล้วจะบอกว่าอยู่ที่ไหน */
+  call('facFind',q).then(l=>{SRES=l;$('#sres').innerHTML=l.length?`<div class="fres" style="margin:0">${l.map(findCard).join('')}</div>`:'<div class="empty">ไม่พบ SVO ที่ตรงกับคำค้น</div>';})
+  .catch(e=>{$('#sres').innerHTML=`<div class="err">${esc(e.message)}</div>`;});}
+function vSend(){const m=M();const t=T0();
+  return head('ส่งซ่อม','ที่นอนที่รับลงจากขนส่งแล้ว ส่งต่อให้ฝ่าย QC (CS ไม่ได้ซ่อมเอง)')+
+  section('รับเข้าแล้ว · รอส่งซ่อม',m.recv.length,'หลัง',m.recv,c=>rowCase(c,`<span class="pill p-done">รับเข้า ${c.recvD?dayDiff(c.recvD,t):0} วัน</span><button class="btn sm" ${dis('CS')} onclick="actSend('${esc(c.key)}')">ส่งซ่อม</button>`),'ไม่มีที่นอนรอส่งซ่อม')+
+  section('ส่งซ่อมแล้ว · รอ QC รับเข้า',m.wait.length,'หลัง',m.wait,c=>rowCase(c,`<span class="pill p-qc">ส่ง ${fd(c.sentD)}</span>`),'-');}
+function vBack(){const m=M();
+  return head('รับกลับที่นอนซ่อมเสร็จ','QC ซ่อมและตรวจผ่านแล้ว · กดรับกลับเพื่อส่งสถานะ "ซ่อมเสร็จ-รอนัดส่ง" ให้เว็บหลัก')+
+  section('ซ่อมเสร็จ · รอรับกลับ',m.back.length,'หลัง',m.back,c=>rowCase(c,`<span class="pill p-ready">QC ผ่าน ${fd(c.doneD)}</span><button class="btn sm ok" ${dis('CS')} onclick="actBack('${esc(c.key)}')">รับกลับเรียบร้อย</button>`),'ยังไม่มีที่นอนซ่อมเสร็จ')+
+  section('รับกลับแล้ว · รอเว็บหลักนัดส่ง',m.ready.length,'หลัง',m.ready,c=>rowCase(c,c.docSt==='issued'?`<button class="btn sm g" ${dis('CS')} onclick="actDocSend('${esc(c.key)}')">ส่งเอกสารให้ลูกค้า</button>`:`<span class="pill p-ready">รับกลับ ${fd(c.backD)}</span>`),'-');}
+/* ---------- ที่นอนนัดส่งลูกค้า (เว็บหลักลงวันนัดส่งแล้ว) ---------- */
+function vDeliv(){const t=T0(),td=dkey(t);const groups={};DELIV.forEach(x=>{(groups[x.deliv]=groups[x.deliv]||[]).push(x);});
+  const today=DELIV.filter(x=>x.deliv===td);
+  let h=head('ที่นอนนัดส่งลูกค้า','เฉพาะเคสที่เว็บหลักลง "วันนัดส่ง" แล้ว · เตรียมที่นอนและกดส่งออกเมื่อขึ้นรถ')+
+  `<div class="tiles">${tile('info','deliv','นัดส่งวันนี้',today.length,'ชิ้น','ส่งออกแล้ว '+today.filter(x=>x.shipped).length)}${tile(today.some(x=>!x.shipped)?'warn':'ok','deliv','วันนี้ยังไม่ส่งออก',today.filter(x=>!x.shipped).length,'ชิ้น','ต้องเตรียมขึ้นรถ')}${tile('','deliv','พรุ่งนี้',DELIV.filter(x=>x.deliv===dkey(dOff(1))).length,'ชิ้น','เตรียมล่วงหน้า')}${tile('','deliv','ทั้งหมดที่นัดแล้ว',DELIV.length,'ชิ้น','ตั้งแต่วันนี้เป็นต้นไป')}</div>`;
+  const row=x=>{const c=CASES.find(z=>z.key===x.key);const fs=x.fac?ST(x.fac==='READY'&&x.st!=='ซ่อมเสร็จ-รอนัดส่ง'?'READY':x.fac):null;
+    return `<div class="row"><div class="who" ${c?`onclick="openCase('${esc(x.key)}')"`:''}><b>${esc(x.svo)}</b> · ${esc(x.name)} ${fs?`<span class="pill ${fs.cls}">${esc(fs.sh||fs.t)}</span>`:'<span class="pill p-done">ไม่ได้ผ่านระบบโรงงาน</span>'}${x.confirm?` <span class="pill p-ready">Confirm: ${esc(x.confirm)}</span>`:''}
+      <div class="m">${esc(x.product)} · ${esc(x.prov)}${x.phone?' · '+esc(x.phone):''}${x.spare&&/YES/i.test(x.spare)?' · มีที่นอนสำรองต้องรับกลับ'+(x.tr?' (TR '+esc(x.tr)+')':''):''}</div>${x.note?`<div class="m">หมายเหตุ: ${esc(x.note)}</div>`:''}</div>
+      <div class="acts">${x.shipped?`<span class="pill p-docok">ส่งออกแล้ว ${esc(x.shipped.slice(11))}${x.shipBy?' · '+esc(x.shipBy):''}</span>`:`<button class="btn sm ok" ${dis('CS')} onclick="actShip('${esc(x.key)}')">ส่งออกจากโรงงานแล้ว</button>`}</div></div>`;};
+  const keys=Object.keys(groups).sort();
+  h+=keys.length?keys.map(k=>{const d=pd(k);const l=groups[k];return section(dayLabel(d)+(dayDiff(t,d)<=1?` <span class="note">${fd(d)}</span>`:''),l.length,'ชิ้น',l,row,'');}).join(''):'<div class="empty">ยังไม่มีนัดส่งลูกค้า</div>';
+  return h;}
+function actShip(key){const x=DELIV.find(z=>z.key===key);if(!x)return;
+  modal('ส่งที่นอนออกจากโรงงาน · '+esc(x.svo),`<div class="note">${esc(x.name)} · ${esc(x.product)} · นัดส่ง ${fd(pd(x.deliv))}</div><div class="fld"><label>หมายเหตุ (เช่น ทะเบียนรถ / ชื่อคนขับ)</label><input id="shn"></div>`,
+  'ยืนยันส่งออก',async()=>{await call('facAction',key,'ship',{note:$('#shn').value});toast(x.svo+' บันทึกส่งออกแล้ว');await reload();},'ok');}
+/* ---------- QC ---------- */
+function vWait(){const m=M();
+  return head('ที่นอนรอซ่อม','ที่นอนที่ CS โรงงานส่งมาแล้ว · กดรับเข้าซ่อมและเลือกไลน์ซ่อม')+
+  section('รอรับเข้าซ่อม',m.wait.length,'หลัง',m.wait.slice().sort((a,b)=>a.sentD-b.sentD),c=>rowCase(c,`<span class="pill ${repAge(c)>B.late?'p-bad':'p-done'}">ส่งมา ${repAge(c)} วัน</span><button class="btn sm" ${dis('QC')} onclick="actStart('${esc(c.key)}')">รับเข้าซ่อม</button>`),'ไม่มีที่นอนรอซ่อม');}
+function vRepair(){const m=M();const l=m.rep.slice().sort((a,b)=>a.sentD-b.sentD);
+  return head('ที่นอนซ่อม','กำลังซ่อม เรียงจากค้างนานสุด · ซ่อมเสร็จแล้วตรวจ QC ในขั้นเดียว · ไม่ผ่านจะนับซ่อมซ้ำ')+
+  section('กำลังซ่อม',l.length,'หลัง',l,c=>rowCase(c,`<span class="pill ${repAge(c)>B.late?'p-bad':'p-done'}">${repAge(c)} วัน</span><button class="btn sm" ${dis('QC')} onclick="actFinish('${esc(c.key)}')">ซ่อมเสร็จ · ตรวจ QC</button>`),'ไม่มีที่นอนกำลังซ่อม')+
+  `<div class="note">นับวันจาก "วันที่ส่งซ่อม" · เกิน ${B.late} วันขึ้นสีแดงและแจ้งเตือนในภาพรวม QC</div>`;}
+function vDoc(){const m=M();const waitQC=CASES.filter(c=>c.docReq&&!c.doneD);const sent=CASES.filter(c=>c.docReq&&c.docSt==='sent');const t=T0();
+  return head('รอเอกสารการตรวจสอบ','ลูกค้าที่ขอเอกสารผลตรวจ · QC ออกเอกสาร → CS โรงงานส่งให้ลูกค้า')+
+  section('QC ต้องออกเอกสาร',m.docTodo.length,'ฉบับ',m.docTodo,c=>rowCase(c,`<span class="pill p-done">ตรวจผ่าน ${dayDiff(c.doneD,t)} วันก่อน</span><button class="btn sm" ${dis('QC')} onclick="actDocIssue('${esc(c.key)}')">ออกเอกสารผลตรวจ</button>`),'ไม่มีเอกสารค้างออก',m.docTodo.length?'var(--warn)':'')+
+  section('ออกแล้ว · รอ CS ส่งลูกค้า',m.docIssued.length,'ฉบับ',m.docIssued,c=>rowCase(c,`<button class="btn sm g" ${dis('CS')} onclick="actDocSend('${esc(c.key)}')">บันทึกว่าส่งลูกค้าแล้ว</button>`),'-')+
+  section('ลูกค้าขอไว้ · ยังซ่อมไม่เสร็จ',waitQC.length,'ราย',waitQC,c=>rowCase(c,pill(c)),'-')+
+  section('ส่งแล้ว',sent.length,'ฉบับ',sent,c=>rowCase(c,'<span class="pill p-docok">ส่งแล้ว</span>'),'-');}
+let FRES=null,FQ='';
+function goFind(){go('all');setTimeout(()=>{const e=$('#q');if(e){e.focus();e.select();}},50);}
+function runFind(){const q=(Q||'').trim();if(q.length<2){toast('พิมพ์อย่างน้อย 2 ตัวอักษร');return;}FQ=q;FRES='load';render();
+  call('facFind',q).then(l=>{if(FQ!==q)return;FRES=l;SRES=l;render();}).catch(e=>{FRES={err:e.message};render();});}
+const FSTEP=['PICKUP','RECV','WAIT','REPAIR','BACK','READY','OUT'];
+function findCard(c,i){const k=FSTEP.indexOf(c.stage);const cls=c.late?'late':c.stage==='WAIT'||c.stage==='REPAIR'?'qc':c.stage==='OUT'||c.stage==='READY'?'out':c.stage==='PICKUP'||c.stage==='MAIN'||c.stage==='CLOSED'?'main':'';
+  return `<div class="fr ${cls}"><div class="h"><b>${esc(c.svo)}</b><span>${esc(c.name)}</span><span class="note">${esc(c.model)}</span>${c.late?'<span class="pill p-bad">เลยกำหนด</span>':''}${c.days!=null?`<span class="pill">${c.days} วัน</span>`:''}</div>
+   ${k>=0?`<div class="fsteps2" title="ความคืบหน้า">${FSTEP.map((x,j)=>`<i class="${j<k?'d':j===k?'c':''}"></i>`).join('')}</div>`:''}
+   <div class="loc"><span>📍 อยู่ที่</span><b>${esc(c.where)}</b><span>กำลังทำ</span><span>${esc(c.what)}</span>${c.next&&c.next!=='-'?`<span>ขั้นต่อไป</span><span>${esc(c.next)}</span>`:''}<span>เว็บหลัก</span><span>${esc(c.svoSt||'-')}</span></div>
+   <div class="acts2">${c.canOpen?`<button class="btn sm" onclick="openCase('${esc(c.key)}')">เปิดเคส</button>`:c.canRecv?'':`<span class="lock">${c.stage==='CLOSED'?'ปิดงานแล้ว · ดูรายละเอียดได้ที่เว็บหลัก':c.inFac?'🔒 ดูได้เฉพาะสถานะ — บัญชีนี้ไม่มีสิทธิ์เปิดรายละเอียดของขั้นตอนนี้':'🔒 ดูได้เฉพาะสถานะ — งานส่วนนี้ยังอยู่ที่ CS / เว็บหลัก'}</span>`}${c.canRecv?`<button class="btn sm g" onclick="actRecvS(${i})">รับเข้าโรงงาน</button>`:''}</div></div>`;}
+function findBlock(){if(!FRES)return `<div class="fhint">กด Enter หรือ "ค้นหาทั้งระบบ" เพื่อค้นข้ามทุกกระบวนการ รวมที่นอนที่เลยวันนัดเก็บ (ซึ่งไม่แสดงในรายการปกติ)</div>`;
+  if(FRES==='load')return '<div class="note" style="margin:10px 0">กำลังค้นหาทั้งระบบ…</div>';
+  if(FRES.err)return `<div class="err" style="margin:10px 0">${esc(FRES.err)}</div>`;
+  return `<h3 style="margin:14px 0 0">ผลค้นหาทั้งระบบ “${esc(FQ)}” · ${FRES.length} รายการ</h3><div class="fres">${FRES.map(findCard).join('')||'<div class="empty">ไม่พบข้อมูล</div>'}</div>`;}
+function vAll(){const l=CASES.filter(c=>(!FST||c.stage===FST)&&(!Q||(c.svo+' '+c.key+' '+c.name+' '+c.phone+' '+c.model+' '+c.brand).toLowerCase().includes(Q.toLowerCase())));
+  return head('เคสทั้งหมด','เคสที่บัญชีนี้มีสิทธิ์เห็น · กดเพื่อดูรายละเอียดและรูป')+
+  `<div class="tb"><input id="q" type="search" placeholder="ค้นหา SVO / ชื่อ / เบอร์ / รุ่น" value="${esc(Q)}" onkeydown="if(event.key==='Enter')runFind()" oninput="Q=this.value;render();const e=$('#q');e.focus();e.setSelectionRange(e.value.length,e.value.length)"><button class="btn sm" type="button" onclick="runFind()">ค้นหาทั้งระบบ</button>
+   <select id="fst" onchange="FST=this.value;render()"><option value="">ทุกสถานะ</option>${STAGES.map(s=>`<option value="${s.k}" ${FST===s.k?'selected':''}>${s.t}</option>`).join('')}</select><span class="note">${l.length} เคสในรายการ</span></div>${findBlock()}
+  <div class="mlist">${l.map(c=>`<div class="kc" onclick="openCase('${esc(c.key)}')" style="cursor:pointer"><div class="top2"><span class="svo">${esc(c.svo)}</span>${pill(c)}</div><div class="nm">${esc(c.name)} <span class="note num">${esc(c.phone)}</span></div><div class="m">${esc(prod(c))}</div>${c.docReq||c.rework?`<div class="top2">${docPill(c)}${rwPill(c)}</div>`:''}</div>`).join('')||'<div class="empty">ไม่พบเคส</div>'}</div>
+  <div class="tw desk"><table><thead><tr><th>เลขที่ SVO</th><th>ลูกค้า</th><th>สินค้า</th><th>สถานะโรงงาน</th><th>เว็บหลักเห็น</th><th>นัดเก็บ</th></tr></thead><tbody>
+  ${l.map(c=>`<tr onclick="openCase('${esc(c.key)}')"><td class="num"><b>${esc(c.svo)}</b></td><td>${esc(c.name)}<br><span class="note num">${esc(c.phone)}</span></td><td>${esc(prod(c))}</td><td>${pill(c)} ${docPill(c)} ${rwPill(c)}</td><td>${esc(c.svoSt)}</td><td class="num">${fd(c.pickupD)}</td></tr>`).join('')}
+  </tbody></table></div>`;}
+function vFlow(){return head('ผังสถานะ & วิธีใช้','เว็บแอปโรงงานอ่าน/เขียนชีต SVO เดียวกับเว็บหลัก')+
+  `<div class="card"><h3>ลำดับสถานะ</h3><div class="map">${STAGES.map((s,i)=>`<div class="mapc"><span class="who">${i+1} · ${s.who}</span><span class="pill ${s.cls}" style="justify-self:start">${s.t}</span><span class="a1">เว็บหลักเห็น: <b>${s.a1}</b></span></div>`).join('')}</div>
+  <p class="note" style="margin-top:12px"><b>CS โรงงาน</b> รับเข้า → ส่งซ่อม → รับกลับ · <b>QC</b> รับเข้าซ่อม → ซ่อม + ตรวจ QC → ส่งคืน CS · ตรวจไม่ผ่านยังอยู่ที่ "กำลังซ่อม" และนับซ่อมซ้ำ · เอกสารผลตรวจทำคู่ขนาน ไม่บล็อกการส่งคืน</p></div>
+  <div class="card"><h3>สิทธิ์การใช้งาน</h3><p class="note">ตั้งที่เว็บหลัก หน้า <b>ทีม / สิทธิ์</b> ช่อง <b>สิทธิ์โรงงาน</b> (CS โรงงาน / QC / เฉพาะเว็บแอปโรงงาน) · USER ทำรายการได้ · VIEW ดูอย่างเดียว · <b>ลบรูป ย้อนขั้นตอน หรือเอาเคสออก ได้เฉพาะ ADMIN / ADMIN SYSTEM</b> · QC ไม่เห็นเบอร์โทรลูกค้า</p>
+  <p class="note">สิทธิ์ของบัญชีนี้: CS โรงงาน = ${P['CS'].see?(P.CS.edit?'ทำรายการได้':'ดูอย่างเดียว')+(P.CS.del?' + ลบได้':''):'ไม่มี'} · QC = ${P['QC'].see?(P.QC.edit?'ทำรายการได้':'ดูอย่างเดียว')+(P.QC.del?' + ลบได้':''):'ไม่มี'}</p></div>`;}
+/* ---------- รายละเอียดเคส ---------- */
+function openCase(key){OPEN=key;GTAB='ALL';DET=null;renderDrawer();call('facCase',key).then(d=>{if(OPEN!==key)return;DET=d;DET.c=toCase(d.c);renderDrawer();}).catch(e=>{if(OPEN!==key)return;DET={err:e.message};renderDrawer();});}
+function closeDrawer(){OPEN=null;DET=null;lbClose();fvClear();const o=$('.ov');if(o)o.remove();}
+function caseByKey(k){return CASES.find(x=>x.key===k)||(DET&&DET.c&&DET.c.key===k?DET.c:null)||(SRES.find(x=>x.key===k));}
+function renderDrawer(){const old=$('.ov');if(old)old.remove();if(!OPEN)return;
+  const c=(DET&&DET.c)||CASES.find(x=>x.key===OPEN);
+  if(!c){return;}
+  const i=SI[c.stage];
+  const files=(DET&&DET.files)||[];
+  const gl=GTAB==='ALL'?files:files.filter(p=>p.stage===GTAB);
+  const tabs=[['ALL','ทั้งหมด'],['PICKUP','ลูกค้าแจ้ง'],['RECV','รับเข้า'],['REPAIR','ซ่อม'],['QC','QC'],['BACK','รับกลับ'],['DOC','เอกสาร']].map(t=>{const n=t[0]==='ALL'?files.length:files.filter(p=>p.stage===t[0]).length;return (n||t[0]==='ALL'||GTAB===t[0])?`<button type="button" class="${GTAB===t[0]?'on':''}" onclick="GTAB='${t[0]}';renderDrawer()">${t[1]} ${n}</button>`:'';}).join('');
+  const PR={PICKUP:['CS','actRecv','รับที่นอนเรียบร้อย'],RECV:['CS','actSend','ส่งซ่อม'],WAIT:['QC','actStart','รับเข้าซ่อม'],REPAIR:['QC','actFinish','ซ่อมเสร็จ · ตรวจ QC'],BACK:['CS','actBack','รับกลับเรียบร้อย']}[c.stage];
+  const prim=PR&&P[PR[0]].see?`<button class="btn" ${dis(PR[0])} onclick="${PR[1]}('${esc(c.key)}')">${PR[2]}</button>`:'';
+  const act=[];
+  if(c.docReq&&c.doneD&&c.docSt==='none'&&sideOn('QC'))act.push(`<button class="btn g" ${dis('QC')} onclick="actDocIssue('${esc(c.key)}')">ออกเอกสารผลตรวจ</button>`);
+  if(c.docReq&&c.docSt==='issued'&&sideOn('CS'))act.push(`<button class="btn g" ${dis('CS')} onclick="actDocSend('${esc(c.key)}')">ส่งเอกสารให้ลูกค้า</button>`);
+  if(sideOn('CS')&&canE('CS')&&c.stage!=='OUT')act.push(`<button class="btn g" onclick="actDocReq('${esc(c.key)}',${c.docReq?'false':'true'})">${c.docReq?'ลูกค้าไม่ขอเอกสารแล้ว':'ลูกค้าขอเอกสารผลตรวจ'}</button>`);
+  const upStages=upStagesFor(c);
+  const photoBtn=upStages.length?`<button class="btn g" onclick="addPhotos('${esc(c.key)}')">+ เพิ่มรูป / ไฟล์</button>`:'';
+  const ex=(DET&&DET.extra)||{};
+  const adm=canDel()&&c.stage!=='PICKUP'&&c.stage!=='OUT'?`<div class="card admz"><h3>สำหรับ ADMIN</h3><div class="note">ใช้แก้กรณีกดผิด · ทุกการลบถูกบันทึกในประวัติ</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+    ${c.stage!=='RECV'?`<button class="btn bad sm" onclick="delStep('${esc(c.key)}')">ย้อนกลับ 1 ขั้นตอน</button>`:''}${canDel('CS')?`<button class="btn bad sm" onclick="delCase('${esc(c.key)}')">เอาเคสออกจากโรงงาน</button>`:''}</div></div>`:'';
+  const body=DET&&DET.err?`<div class="err">${esc(DET.err)}</div>`:`
+   <div class="sync"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg><div>เว็บหลัก (CS DATA SYSTEM) สถานะ SVO: <b>${esc(c.svoSt||'-')}</b></div></div>
+   <div class="card"><div class="steps">${STAGES.map((s,j)=>`<div class="st ${j<i?'done':j===i?'cur':''}"><i></i>${s.sh||s.t}</div>`).join('')}</div></div>
+   <div class="card kv">${sideOn('CS')?`<div><small>เบอร์โทร</small>${esc(c.phone||'-')}</div><div><small>จังหวัด</small>${esc(c.prov||'-')}</div>`:''}<div><small>สินค้า</small>${esc(prod(c)||'-')}${c.type?' · '+esc(c.type):''}</div><div><small>ปัญหาที่แจ้ง</small>${esc(c.prob||'-')}</div>
+    <div><small>วันนัดเก็บสินค้า</small>${fd(c.pickupD)}</div><div><small>รับเข้าโรงงาน</small>${fdt(c.recvD)}${ex.cond?'<br><span class="note">'+esc(ex.cond)+(ex.recvNote?' · '+esc(ex.recvNote):'')+'</span>':''}</div>
+    <div><small>ส่งซ่อม (CS)</small>${fd(c.sentD)}${ex.symptom?'<br><span class="note">'+esc(ex.symptom)+'</span>':''}</div><div><small>QC รับเข้าซ่อม</small>${c.startD?fd(c.startD)+' · '+esc(c.line):'-'}${ex.eval?'<br><span class="note">'+esc(ex.eval)+'</span>':''}</div>
+    <div><small>ซ่อมเสร็จ / ผล QC</small>${c.doneD?'ผ่าน · '+fd(c.doneD)+(ex.qcBy?' · '+esc(ex.qcBy):''):'-'}${ex.fix?'<br><span class="note">'+esc(ex.fix)+'</span>':''}</div><div><small>CS รับกลับ</small>${fdt(c.backD)}</div>
+    <div><small>เอกสารผลตรวจ</small>${c.docReq?({none:'ลูกค้าขอ · ยังไม่ออก',issued:'ออกแล้ว · รอส่งลูกค้า',sent:'ส่งลูกค้าแล้ว'+(ex.docChannel?' ทาง '+esc(ex.docChannel):'')}[c.docSt]):'ลูกค้าไม่ได้ขอ'}</div><div><small>ซ่อมซ้ำ</small>${c.rework?c.rework+' ครั้ง'+(ex.failWhy?'<br><span class="note">'+esc(ex.failWhy)+'</span>':''):'-'}</div></div>
+   <div class="acts-top" style="display:flex;gap:8px;flex-wrap:wrap">${prim?`<span class="only-desk" style="display:contents">${prim}</span>`:''}${act.join('')}${photoBtn?`<span class="only-desk" style="display:contents">${photoBtn}</span>`:''}</div>
+   <div class="card"><h3>รูปและไฟล์</h3>${DET?`<div class="gtabs">${tabs}</div><div class="gal">${gl.length?gl.map(p=>{const k=files.indexOf(p);return `<button type="button" onclick="viewFile(${k})"><span class="th" data-k="${k}">${p.mime==='application/pdf'?'<span class="doc">PDF</span>':'<span class="ph0">…</span>'}</span><span class="cap">${esc(p.cap||p.name)}${p.t?' · '+fd(pd(p.t)):''}</span></button>`}).join(''):'<div class="empty" style="grid-column:1/-1">ยังไม่มีรูปในขั้นนี้</div>'}</div>`:'<div class="note">กำลังโหลด…</div>'}</div>
+   <div class="card"><h3>ประวัติการทำรายการ</h3><div class="log">${DET?((DET.log||[]).slice().reverse().map(l=>`<div><time>${fdt(pd(l.t))}</time><span>${esc(l.x)}<br><span class="by">${esc(l.by)}</span></span></div>`).join('')||'<div class="note">ยังไม่มี</div>'):'<div class="note">กำลังโหลด…</div>'}</div></div>${adm}`;
+  $('#layer').insertAdjacentHTML('afterbegin',`<div class="ov" onclick="if(event.target===this)closeDrawer()"><aside class="dr" role="dialog" aria-label="รายละเอียดเคส">
+   <div class="drh"><div><div class="note">${esc(c.key)}</div><h2>${esc(c.svo)} · ${esc(c.name)}</h2><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${pill(c)}${docPill(c)}${rwPill(c)}</div></div><button class="x" onclick="closeDrawer()" aria-label="ปิด">×</button></div>
+   ${body}
+  </aside>${prim||photoBtn?`<div class="dr-foot">${prim}${photoBtn?`<button class="btn g ${prim?'more':''}" onclick="addPhotos('${esc(c.key)}')"><span style="display:inline-flex;gap:6px;align-items:center"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO.cam}</svg>${prim?'รูป':'เพิ่มรูป / ไฟล์'}</span></button>`:''}</div>`:''}</div>`);
+  if(DET&&DET.files)loadThumbs();}
+const THUMB={};
+function loadThumbs(){const key=OPEN;document.querySelectorAll('.gal .th[data-k]').forEach(el=>{const p=DET.files[+el.dataset.k];if(!p||p.mime==='application/pdf')return;
+  const put=r=>{if(r&&r.b64)el.innerHTML=`<img src="data:${r.mime};base64,${r.b64}" alt="">`;else if(r&&/pdf/.test(r.mime||''))el.innerHTML='<span class="doc">PDF</span>';else el.innerHTML='<span class="ph0">ไฟล์</span>';};
+  if(THUMB[p.fid]){put(THUMB[p.fid]);return;}
+  call('facFile',key,p.fid,true).then(r=>{THUMB[p.fid]=r;if(OPEN===key)put(r);}).catch(()=>{el.innerHTML='<span class="ph0">ดูไม่ได้</span>';});});}
+let FVURL='',FVK=-1;const FVC={};
+/* ดูรูปแบบเลื่อนซ้าย-ขวา: ปัด/ลูกศร/ปุ่ม ไม่ต้องปิดก่อน · จำไฟล์ที่เปิดแล้วและโหลดรูปข้าง ๆ ล่วงหน้า */
+function fvLoad(key,p){if(FVC[p.fid])return Promise.resolve(FVC[p.fid]);
+  return call('facFile',key,p.fid,false).then(r=>{const bin=atob(r.b64),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+    const o={url:URL.createObjectURL(new Blob([arr],{type:r.mime})),mime:r.mime};FVC[p.fid]=o;return o;});}
+function fvClear(){Object.keys(FVC).forEach(k=>{try{URL.revokeObjectURL(FVC[k].url);}catch(e){}delete FVC[k];});}
+function viewFile(k){if(!DET||!DET.files[k])return;const p=DET.files[k];FVK=k;const key=OPEN;
+  if(!$('#lb')){$('#layer').insertAdjacentHTML('beforeend','<div id="lb" class="lb"><div class="lbi"></div><div class="bar2"></div></div>');lbSwipe($('#lb'));}
+  const n=DET.files.length;
+  const bar=()=>`<button type="button" onclick="lbMove(-1)" ${k?'':'disabled'}>‹ ก่อนหน้า</button><span>${k+1} / ${n} · ${esc(p.cap||p.name)}${p.t?' · '+fdt(pd(p.t)):''}${p.by?' · '+esc(p.by):''}</span><button type="button" onclick="lbMove(1)" ${k<n-1?'':'disabled'}>ถัดไป ›</button>${FVURL?`<a href="${FVURL}" download="${esc(p.name||'file')}">ดาวน์โหลด</a>`:''}${canDelFile(p)?`<button type="button" class="del" onclick="delFile(${k})">ลบไฟล์นี้</button>`:''}<button type="button" onclick="lbClose()">ปิด</button>`;
+  FVURL='';$('#lb .lbi').innerHTML='<div class="note" style="margin:auto;color:#E1E0CC">กำลังเปิดไฟล์…</div>';$('#lb .bar2').innerHTML=bar();
+  fvLoad(key,p).then(o=>{if(!$('#lb')||FVK!==k)return;FVURL=o.url;
+    $('#lb .lbi').innerHTML=String(o.mime).indexOf('image')===0?`<img src="${o.url}" alt="" draggable="false">`:/pdf/.test(o.mime)?`<iframe src="${o.url}" title="PDF"></iframe>`:'<div class="note" style="margin:auto;color:#E1E0CC">ไฟล์ประเภทนี้แสดงไม่ได้ — กดดาวน์โหลด</div>';
+    $('#lb .bar2').innerHTML=bar();
+    [k+1,k-1].forEach(j=>{const q=DET&&DET.files[j];if(q&&OPEN===key)fvLoad(key,q).catch(()=>{});});})
+  .catch(e=>{if($('#lb')&&FVK===k)$('#lb .lbi').innerHTML=`<div class="err" style="margin:auto">${esc(e.message)}</div>`;});}
+function lbSwipe(el){let x0=null,y0=0;
+  el.addEventListener('touchstart',e=>{if(e.touches.length!==1){x0=null;return;}x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+  el.addEventListener('touchend',e=>{if(x0===null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.3)lbMove(dx<0?1:-1);},{passive:true});}
+function lbMove(d){const k=FVK+d;if(!DET||k<0||k>=DET.files.length)return;viewFile(k);}
+function lbClose(){const e=$('#lb');if(e)e.remove();FVURL='';FVK=-1;}
+const PHOTO_SIDE={RECV:'CS',BACK:'CS',REPAIR:'QC',QC:'QC',DOC:'QC'};
+function canDelFile(p){return !/^SVO\d/.test(p.id)&&canDel(PHOTO_SIDE[p.stage]||'CS');}
+function upStagesFor(c){const o=[];if(c.stage==='PICKUP')return o;
+  if(canE('CS')&&sideOn('CS'))o.push(['RECV','รับเข้า'],['BACK','รับกลับ']);
+  if(canE('QC')&&sideOn('QC')&&['WAIT','REPAIR','BACK','READY','OUT'].includes(c.stage))o.push(['REPAIR','ซ่อม'],['QC','QC'],['DOC','เอกสาร']);
+  return o;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#sheet'))closeSheet();else if($('#lb'))lbClose();else if($('.md'))closeModal();else if(OPEN)closeDrawer();}if($('#lb')&&(e.key==='ArrowRight'||e.key==='ArrowLeft'))lbMove(e.key==='ArrowRight'?1:-1);});
+/* ---------- ฟอร์ม + อัปโหลด ---------- */
+let PEND=[],BUSY=false;
+function modal(title,body,okText,onOk,okCls){PEND=[];
+  $('#layer').insertAdjacentHTML('beforeend',`<div class="md" onclick="if(event.target===this&&!BUSY)closeModal()"><form class="mdb" id="mdf"><h3>${title}</h3>${body}<div class="err" id="merr"></div><div class="mf"><button type="button" class="btn g" id="mcancel" onclick="closeModal()">ยกเลิก</button><button type="submit" class="btn ${okCls||''}" id="mok">${okText}</button></div></form></div>`);
+  $('#mdf').addEventListener('submit',async e=>{e.preventDefault();if(BUSY)return;$('#merr').textContent='';
+    const okB=$('#mok'),t0=okB.textContent;BUSY=true;okB.disabled=true;$('#mcancel').disabled=true;okB.textContent='กำลังบันทึก…';
+    try{await onOk();BUSY=false;closeModal();}catch(err){$('#merr').textContent=err.message||String(err);}
+    finally{BUSY=false;const b=$('#mok');if(b){b.disabled=false;b.textContent=t0;}const cb=$('#mcancel');if(cb)cb.disabled=false;}});}
+function closeModal(){if(BUSY)return;const m=$('.md');if(m)m.remove();}
+const ACCEPT_UP='image/'+'*,application/pdf';
+const upBox=(lbl,req)=>`<div class="fld"><label>${lbl}${req?' *':''}</label><div class="up"><label class="btn g sm" style="cursor:pointer">ถ่ายรูป / เลือกไฟล์<input type="file" accept="${ACCEPT_UP}" multiple hidden onchange="pickFiles(this)"></label><span class="note">รูปถูกย่อขนาดอัตโนมัติ</span></div><div class="thumbs" id="thumbs"></div></div>`;
+function readB64(f){return new Promise((res,rej)=>{const rd=new FileReader();rd.onload=()=>res(String(rd.result).split(',')[1]||'');rd.onerror=rej;rd.readAsDataURL(f);});}
+function prepFile(f){
+  if(String(f.type).indexOf('image')!==0||f.type==='image/gif'){if(f.size>20*1024*1024)return Promise.reject(new Error('ไฟล์ใหญ่เกิน 20 MB'));return readB64(f).then(b64=>({b64,mime:f.type||'application/pdf',name:f.name}));}
+  return new Promise(res=>{const url=URL.createObjectURL(f),img=new Image();
+    img.onload=()=>{const MX=1400,k=Math.min(1,MX/Math.max(img.naturalWidth,img.naturalHeight)),w=Math.round(img.naturalWidth*k),h=Math.round(img.naturalHeight*k);
+      const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);
+      res({b64:c.toDataURL('image/jpeg',0.82).split(',')[1],mime:'image/jpeg',name:f.name.replace(/\.[^.]+$/,'')+'.jpg'});};
+    img.onerror=()=>{URL.revokeObjectURL(url);readB64(f).then(b64=>res({b64,mime:f.type,name:f.name}));};
+    img.src=url;});}
+async function pickFiles(inp){const fs=[...inp.files];inp.value='';const got=await Promise.all(fs.map(f=>prepFile(f).catch(e=>{toast(e.message);return null;})));got.forEach(x=>{if(x)PEND.push(x);});
+  const t=$('#thumbs');if(t)t.innerHTML=PEND.map((x,i)=>`<span class="tw2">${x.mime==='application/pdf'?'<span class="doc">PDF</span>':`<img src="data:${x.mime};base64,${x.b64}" alt="">`}<button type="button" onclick="PEND.splice(${i},1);pickFiles({files:[],value:''})" aria-label="เอาออก">×</button></span>`).join('');}
+/* อัปโหลดพร้อมกันครั้งละ 3 ไฟล์ · แจ้งกลุ่ม LINE ครั้งเดียวหลังอัปโหลดครบ (เรียงรูปตามลำดับที่เลือก) */
+async function uploadPend(key,stage,cap){const st=$('#mok'),L=PEND.slice(),res=new Array(L.length);let i=0,done=0,err=null;
+  if(st)st.textContent=`อัปโหลด 0/${L.length}…`;
+  try{await Promise.all(Array.from({length:Math.min(3,L.length)},async()=>{while(i<L.length&&!err){const k=i++,x=L[k];
+      try{const r=await call('facUpload',key,stage,x.name,x.mime,x.b64,cap);res[k]=r&&r.fid;}catch(e){err=err||e;}
+      done++;if(st)st.textContent=`อัปโหลด ${done}/${L.length}…`;}}));}
+  finally{const fids=res.filter(Boolean);if(fids.length)call('facNotify',key,stage,fids,cap).catch(()=>{});}
+  if(err)throw err;
+  return res.filter(Boolean).length;}
+const sub=c=>`<div class="note">${esc(c.name)} · ${esc(prod(c))}${c.line?' · '+esc(c.line):''}${c.rework?' · ซ่อมซ้ำครั้งที่ '+c.rework:''}</div>`;
+async function doAct(key,act,p,stage,cap,okMsg){await call('facAction',key,act,p);let up=0;
+  if(PEND.length){try{up=await uploadPend(key,stage,cap);}catch(e){toast('บันทึกแล้ว แต่อัปโหลดรูปไม่สำเร็จ: '+e.message+' — เพิ่มรูปภายหลังได้');}}
+  toast(okMsg);await reload();if(OPEN===key)openCase(key);}
+/* CS โรงงาน */
+function actRecv(key){const c=caseByKey(key);
+  modal('รับที่นอนเข้าโรงงาน · '+esc(c.svo),sub(c)+`<div class="fld"><label>สภาพตอนรับ</label><select id="cond"><option>สภาพตามที่ลูกค้าแจ้ง</option><option>พบความเสียหายเพิ่ม</option><option>ของไม่ครบ / ไม่ตรงรุ่น</option></select></div>`+upBox('รูปสภาพตอนรับ',1)+`<div class="fld"><label>หมายเหตุ</label><textarea id="rnote" rows="2"></textarea></div>`,
+  'ยืนยันรับที่นอน',async()=>{if(!PEND.length)throw new Error('ถ่ายรูปสภาพตอนรับอย่างน้อย 1 รูป');
+   await doAct(key,'recv',{cond:$('#cond').value,note:$('#rnote').value},'RECV','สภาพตอนรับ',c.svo+' รับเข้าแล้ว · เว็บหลักเห็น "สินค้าถึงโรงงานแล้ว"');});}
+function actRecvS(i){const c=SRES[i];if(!c)return;actRecv(c.key);}
+function actSend(key){const c=caseByKey(key);
+  modal('ส่งซ่อม · '+esc(c.svo),sub(c)+`<div class="fld"><label>อาการที่ต้องซ่อม (แจ้ง QC)</label><textarea id="rp" rows="3">${esc(c.prob)}</textarea></div>`+upBox('รูปจุดที่ต้องซ่อม',0),
+  'ส่งให้ฝ่าย QC',async()=>{await doAct(key,'send',{symptom:$('#rp').value},'RECV','จุดที่ต้องซ่อม',c.svo+' ส่งซ่อมแล้ว · ขึ้นที่ QC หน้า "ที่นอนรอซ่อม"');});}
+function actBack(key){const c=caseByKey(key);
+  modal('รับกลับที่นอนซ่อมเสร็จ · '+esc(c.svo),sub(c)+`<div class="fld"><label>ตรวจรับ</label><select id="bk"><option value="ok">สภาพเรียบร้อย พร้อมส่งคืน</option><option value="bad">พบปัญหา · ส่งกลับให้ QC</option></select></div><div class="fld"><label>หมายเหตุ</label><textarea id="bn" rows="2"></textarea></div>`+upBox('รูปตอนรับกลับ',0),
+  'ยืนยัน',async()=>{const ok=$('#bk').value==='ok';if(!ok&&!$('#bn').value.trim())throw new Error('ใส่ปัญหาที่พบในหมายเหตุ');
+   await doAct(key,'back',{ok,note:$('#bn').value},'BACK','ตอนรับกลับ',ok?c.svo+' รับกลับแล้ว · เว็บหลักเป็น "ซ่อมเสร็จ-รอนัดส่ง"':c.svo+' ส่งกลับ QC แล้ว');},'ok');}
+function actDocSend(key){const c=caseByKey(key);
+  modal('ส่งเอกสารให้ลูกค้า · '+esc(c.svo),sub(c)+`<div class="fld"><label>ช่องทาง</label><select id="ch"><option>LINE</option><option>อีเมล</option><option>ไปรษณีย์ / แนบไปกับที่นอน</option></select></div>`,
+  'บันทึกว่าส่งแล้ว',async()=>{await doAct(key,'docsend',{channel:$('#ch').value},'','','บันทึกการส่งเอกสารแล้ว');},'ok');}
+function actDocReq(key,on){const c=caseByKey(key);
+  modal(on?'ลูกค้าขอเอกสารผลตรวจ':'ยกเลิกคำขอเอกสาร',sub(c)+`<div class="note">${on?'QC จะต้องออกเอกสารผลตรวจหลังซ่อมเสร็จ และขึ้นแจ้งเตือนจนกว่าจะส่งลูกค้า':'จะไม่ขึ้นแจ้งเตือนเรื่องเอกสารของเคสนี้'} · บันทึกลงช่อง "ลูกค้าขอเอกสารผลตรวจ" ใน SVO</div>`,
+  'ยืนยัน',async()=>{await doAct(key,'docreq',{on},'','','บันทึกแล้ว');});}
+/* QC */
+function actStart(key){const c=caseByKey(key);
+  modal('รับเข้าซ่อม · '+esc(c.svo),sub(c)+`<div class="note">อาการที่แจ้ง: ${esc(c.prob||'-')}</div><div class="fld"><label>ไลน์ซ่อม</label><select id="ln">${B.lines.map(l=>`<option>${esc(l)}</option>`).join('')}</select></div><div class="fld"><label>ประเมินอาการ</label><textarea id="ev" rows="2" placeholder="เช่น เปลี่ยนสปริงชุดกลาง / ซ่อมขาเตียง"></textarea></div>`,
+  'รับเข้าซ่อม',async()=>{await doAct(key,'start',{line:$('#ln').value,eval:$('#ev').value},'','',c.svo+' รับเข้าซ่อมแล้ว');});}
+function actFinish(key){const c=caseByKey(key);
+  modal('ซ่อมเสร็จ · ตรวจ QC · '+esc(c.svo),sub(c)+`<div class="fld"><label>สิ่งที่ซ่อม</label><textarea id="fx" rows="2" placeholder="เช่น เปลี่ยนสปริงชุดกลาง 12 ตัว"></textarea></div>
+   <div class="fld"><label>รายการตรวจ QC (ติ๊กข้อที่ผ่าน)</label><div class="chk">${B.qc.map((q,i)=>`<label><input type="checkbox" id="q${i}" value="${esc(q)}"> ${esc(q)}</label>`).join('')}</div></div>`+upBox('รูปหลังซ่อม / ผลตรวจ',1)+
+   `<div class="fld"><label>ผลการตรวจ</label><select id="qr"><option value="pass">ผ่าน · ส่งคืน CS โรงงาน</option><option value="fail">ไม่ผ่าน · ซ่อมซ้ำ</option></select></div><div class="fld"><label>เหตุผลถ้าไม่ผ่าน</label><textarea id="qn" rows="2"></textarea></div>`,
+  'บันทึกผล',async()=>{const items=B.qc.filter((_,i)=>$('#q'+i).checked);const pass=$('#qr').value==='pass';
+   if(!PEND.length)throw new Error('แนบรูปหลังซ่อมอย่างน้อย 1 รูป');
+   if(pass&&items.length<B.qc.length)throw new Error('ผ่าน QC ได้เมื่อติ๊กครบทุกข้อ');
+   if(!pass&&!$('#qn').value.trim())throw new Error('ใส่เหตุผลที่ไม่ผ่าน');
+   await doAct(key,'finish',{pass,items,fix:$('#fx').value,reason:$('#qn').value},pass?'QC':'REPAIR',pass?'หลังซ่อม · QC ผ่าน':'QC ไม่ผ่าน',pass?c.svo+' ผ่าน QC · ขึ้นที่ CS หน้า "รับกลับ"'+(c.docReq?' · อย่าลืมออกเอกสาร':''):c.svo+' ไม่ผ่าน · ยังอยู่ในหน้าที่นอนซ่อม');});}
+function actDocIssue(key){const c=caseByKey(key);
+  modal('ออกเอกสารผลตรวจสอบ · '+esc(c.svo),sub(c)+`<div class="note">แนบไฟล์เอกสารผลตรวจ (PDF หรือรูป) ที่จะส่งให้ลูกค้า</div>`+upBox('ไฟล์เอกสาร',1),
+  'บันทึกเอกสาร',async()=>{if(!PEND.length)throw new Error('แนบไฟล์เอกสารก่อน');await doAct(key,'docissue',{},'DOC','เอกสารผลตรวจ','ออกเอกสารแล้ว · รอ CS ส่งลูกค้า');});}
+function addPhotos(key){const c=caseByKey(key);const st=upStagesFor(c);if(!st.length)return;
+  const def={RECV:'RECV',WAIT:'RECV',REPAIR:'REPAIR',BACK:'QC',READY:'BACK',OUT:'BACK'}[c.stage];
+  modal('เพิ่มรูป / ไฟล์ · '+esc(c.svo),`<div class="fld"><label>ขั้นตอน</label><select id="ps">${st.map(x=>`<option value="${x[0]}" ${x[0]===def?'selected':''}>${x[1]}</option>`).join('')}</select></div>`+upBox('รูปหรือไฟล์ PDF',1)+`<div class="fld"><label>คำอธิบาย</label><input id="pcap" placeholder="เช่น จุดยุบตัวฝั่งซ้าย"></div>`,
+  'บันทึกรูป',async()=>{if(!PEND.length)throw new Error('เลือกรูปอย่างน้อย 1 รูป');const n=await uploadPend(key,$('#ps').value,$('#pcap').value||'รูปเพิ่มเติม');toast('บันทึกรูปแล้ว '+n+' ไฟล์');if(OPEN===key)openCase(key);});}
+/* ลบ (ADMIN / ADMIN SYSTEM) */
+function delFile(k){const p=DET.files[k];const key=OPEN;lbClose();
+  modal('ลบรูป / ไฟล์ที่แนบผิด?',`<div class="note">${esc(p.cap||p.name)} · ไฟล์จะถูกย้ายไปถังขยะ ปิดลิงก์รูป และบันทึกในประวัติ<br>ถ้ารูปนี้ถูกส่งเข้ากลุ่ม LINE แล้ว ระบบจะแจ้งกลุ่มว่า "ยกเลิกรูปที่ส่งผิด" ให้อัตโนมัติ</div>`,'ลบไฟล์',async()=>{const r=await call('facDelete','file',key,p.id);toast(r.msg);openCase(key);},'bad');}
+function delStep(key){const c=caseByKey(key);const s=ST(c.stage),pv=STAGES[SI[c.stage]-1];
+  modal('ย้อนกลับ 1 ขั้นตอน?',sub(c)+`<div class="note">${esc(s.t)} → <b>${esc(pv?pv.t:'')}</b> · ล้างข้อมูลของขั้นปัจจุบัน และปรับสถานะ / วันที่ใน SVO ให้ตรง</div>`,'ย้อนขั้นตอน',async()=>{const r=await call('facDelete','step',key);toast(r.msg);await reload();openCase(key);},'bad');}
+function delCase(key){const c=caseByKey(key);
+  modal('เอาเคสออกจากโรงงาน?',sub(c)+`<div class="note">ลบข้อมูลโรงงานของเคสนี้ (รูปและประวัติยังอยู่) · ถ้าสถานะ SVO เป็น "สินค้าถึงโรงงานแล้ว" จะกลับเป็น "รอเก็บสินค้า" · ใช้กรณีรับเข้าผิดเคส</div>`,'เอาออก',async()=>{const r=await call('facDelete','case',key);toast(r.msg);closeDrawer();await reload();},'bad');}
+/* ---------- โหลดข้อมูล ---------- */
+async function reload(force){try{const d=await call('facData');CASES=d.cases.map(toCase);DELIV=d.deliv||[];LOADED=Date.now();render();if(force)toast('อัปเดตข้อมูลแล้ว');}catch(e){if(force)toast(e.message);}}
+setInterval(()=>{if(B&&!document.hidden&&!$('.md')&&Date.now()-LOADED>90000)reload();},30000);
+let TT=0;function toast(m){let t=$('.toast');if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t);}t.textContent=m;t.hidden=false;clearTimeout(TT);TT=setTimeout(()=>t.hidden=true,3600);}
+/* ---------- เข้าสู่ระบบ ---------- */
+let LSTEP='pin';
+function showLogin(msg){B=null;$('#app').hidden=true;$('#login').hidden=false;LSTEP='pin';$('#lgPin2Row').hidden=true;$('#lgBtn').textContent='เข้าสู่ระบบ';$('#lgMsg').textContent=msg||'';}
+async function doLogin(){const code=$('#lgCode').value.trim(),pin=$('#lgPin').value.trim(),pin2=$('#lgPin2').value.trim();$('#lgMsg').textContent='';
+  if(!code){$('#lgMsg').textContent='กรอกรหัสพนักงาน';return;}
+  const p=LSTEP==='setup'?{code,newPin:pin}:{code,pin};
+  if(LSTEP==='setup'&&pin!==pin2){$('#lgMsg').textContent='PIN ทั้งสองช่องไม่ตรงกัน';return;}
+  $('#lgBtn').disabled=true;
+  try{const r=await TP.gs('login',p);
+    if(r.needSetup){LSTEP='setup';$('#lgPin2Row').hidden=false;$('#lgBtn').textContent='ตั้ง PIN และเข้าสู่ระบบ';$('#lgMsg').textContent='ครั้งแรก: ตั้ง PIN 4–8 หลัก';return;}
+    if(r.error){$('#lgMsg').textContent=r.error;return;}
+    TP.setTok(r.token);start();}
+  catch(e){$('#lgMsg').textContent=e.message;}finally{$('#lgBtn').disabled=false;}}
+function logout(){const t=TP.getTok();TP.setTok('');TP.gs('logout',t).catch(()=>{});showLogin('ออกจากระบบแล้ว');}
+async function start(){$('#login').hidden=true;$('#app').hidden=false;$('#view').innerHTML='<div class="empty">กำลังโหลด…</div>';
+  try{B=await call('facBoot');P=B.perms;try{const md=localStorage.getItem('fac_mode');if(md==='CS'||md==='QC')MODE=md;}catch(e){}let v='';try{v=sessionStorage.getItem('fac_view')||'';}catch(e){}
+    VIEW=pagesAllowed().some(p=>p[0]===v)?v:pagesAllowed()[0][0];
+    const d=await call('facData');CASES=d.cases.map(toCase);DELIV=d.deliv||[];LOADED=Date.now();render();deepCase();}
+  catch(e){if(/เข้าสู่ระบบ/.test(e.message))return;$('#view').innerHTML=`<div class="card" style="margin-top:20px"><b>เปิดเว็บแอปโรงงานไม่ได้</b><div class="err" style="margin-top:6px">${esc(e.message)}</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn sm" onclick="start()">ลองใหม่</button><button class="btn g sm" onclick="logout()">เข้าสู่ระบบด้วยบัญชีอื่น</button></div></div>`;}}
+/* ลิงก์จาก LINE: ...?app=factory&case=รหัสงาน → เปิดเคสนั้นทันทีหลังเข้าสู่ระบบ */
+let DEEP_DONE=false;
+function deepCase(){if(DEEP_DONE)return;DEEP_DONE=true;const go=p=>{const k=p&&p.case;if(k)setTimeout(()=>openCase(String(k)),300);};
+  try{if(window.google&&google.script&&google.script.url)google.script.url.getLocation(l=>go(l.parameter));else go(Object.fromEntries(new URLSearchParams(location.search)));}catch(e){}}
+if(TP.getTok())start();else showLogin('');
+
+</script>
+</body></html>

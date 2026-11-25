@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="th"><head><script>/* GitHub Pages: แทน google.script.run ด้วยการเรียก Apps Script (เฉพาะคำสั่งของฟอร์มสาธารณะ) */
+var API_URL='https://script.google.com/macros/s/AKfycbzGmXR5dNe7f9gK23jcMPt-CzSTc6m1AjO5OD7qM4SvfpkF2vmUVwytQkoxpwIdfyo/exec';
+window.google={script:{run:(function(){function mk(ok,fail){return new Proxy({},{get:function(_,fn){
+  if(fn==='withSuccessHandler')return function(f){return mk(f,fail);};if(fn==='withFailureHandler')return function(f){return mk(ok,f);};
+  return function(){var a=[].slice.call(arguments);fetch(API_URL,{method:'POST',body:JSON.stringify({k:'pub',fn:fn,args:a}),redirect:'follow'})
+   .then(function(r){return r.json().catch(function(){return {error:'เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง'};});})
+   .then(function(j){if(j.error){if(fail)fail(new Error(j.error));}else if(ok)ok(j.data);})
+   .catch(function(){if(fail)fail(new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ — ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่'));});};}});}return mk(null,null);})()}};</script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=Kanit:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--pri:#1F4E78;--navy:#0C2034;--bg:#EEF1EC;--card:#fff;--line:#D9DED6;--mut:#5f6b76;--bad:#b42318;--ok:#15803d}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:#14202c;font:16px/1.55 Sarabun,Tahoma,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:12px}
+.head{border-top:10px solid var(--pri)}.head h1{font:600 24px Kanit,Sarabun,sans-serif;margin:0 0 6px;color:var(--navy)}.head p{margin:0;color:var(--mut);font-size:14px}
+.sec{font:600 18px Kanit,Sarabun,sans-serif;color:var(--navy);margin:0 0 4px}.sec+p{margin:0 0 6px;color:var(--mut);font-size:13px}
+.q{padding:14px 0;border-top:1px solid #eef0ec}.q:first-of-type{border-top:0}.q label.t{display:block;font-weight:600;margin-bottom:8px}.q label.t b{color:var(--bad)}.q .h{color:var(--mut);font-size:13px;margin:-4px 0 8px}
+input[type=text],input[type=tel],input[type=date],input[type=number],textarea,select{width:100%;font:inherit;padding:10px 12px;border:1px solid #c7cdc4;border-radius:8px;background:#fff;color:inherit}
+input:focus,textarea:focus,select:focus{outline:2px solid #9cc0e3;border-color:var(--pri)}
+textarea{min-height:96px;resize:vertical}
+.opts{display:grid;gap:6px}.opts.c2{grid-template-columns:1fr 1fr}@media(max-width:560px){.opts.c2{grid-template-columns:1fr}}
+.opt{display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid #e1e5de;border-radius:8px;cursor:pointer}.opt:hover{background:#f5f8f4}.opt input{width:18px;height:18px;margin:0;accent-color:var(--pri)}
+.opt.other{flex-wrap:wrap}.opt.other input[type=text]{flex:1;min-width:160px;padding:6px 10px}
+.err{color:var(--bad);font-size:13px;margin-top:6px;display:none}.q.bad .err{display:block}.q.bad input[type=text],.q.bad input[type=tel],.q.bad input[type=date],.q.bad input[type=number],.q.bad textarea,.q.bad select{border-color:var(--bad)}
+.bar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.btn{font:600 16px Sarabun,sans-serif;border:0;border-radius:8px;padding:11px 22px;background:var(--pri);color:#fff;cursor:pointer}.btn.g{background:transparent;color:var(--pri)}.btn:disabled{opacity:.6;cursor:wait}
+.hp{position:absolute;left:-5000px;width:1px;height:1px;overflow:hidden}
+.done{text-align:center;padding:34px 20px}.done .ic{width:64px;height:64px;border-radius:50%;background:#DCFCE7;color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 12px}
+.done h2{font:600 22px Kanit,Sarabun,sans-serif;margin:0 0 6px;color:var(--navy)}.done .no{font:700 22px Kanit,sans-serif;color:var(--pri);margin:10px 0}
+.load{color:var(--mut);text-align:center;padding:30px}
+.foot{color:var(--mut);font-size:12px;text-align:center}
+</style></head><body><div class="wrap" id="app"><div class="card head"><h1>New MEMO / REFUND INFORMATION</h1><p>กำลังโหลดแบบฟอร์ม…</p></div></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let O=null;
+/* โครงฟอร์มตาม Google Form เดิม: [หัวข้อ, ชนิด, รายการตัวเลือก(ชื่อ LISTS), บังคับ, คำอธิบาย] */
+const SECS=[
+ ['ข้อมูล MEMO','',[['วันที่','date','',1],['เรียน','radio','เรียน REFUND',1],['เรื่อง','radio+','เรื่อง REFUND',1],['อ้างอิงเอกสาร','text','',1,'อ้างอิง เอกสาร (เช่น Memo ฝ่ายขาย / เลขที่เอกสาร)'],['กลุ่มปัญหา','radio+','กลุ่มปัญหา REFUND',1]]],
+ ['1. หนังสือแจ้งขอคืนเงิน','',[['หนังสือแจ้งขอคืนเงิน','radio+','บริษัท REFUND',1],['Type สถานที่ซื้อ','radio+','สถานที่ซื้อ REFUND',1],['ห้าง-สาขาที่ซื้อ','text','',1],['ช่องทางการชำระเงิน','select','ช่องทางชำระ REFUND',1,'ช่องทางการชำระเงินของลูกค้า'],['เลขที่ Order','text','',1]]],
+ ['ข้อมูลลูกค้าและสินค้า','',[['ชื่อลูกค้า','text','',1,'ชื่อ-นามสกุล ลูกค้า'],['เบอร์โทรลูกค้า','tel','',1],['ประเภทสินค้า','radio+','ประเภทสินค้า REFUND',1,'ประเภทสินค้าที่ขอคืนเงิน'],['แบรนด์','radio+','แบรนด์ REFUND',1,'แบรนด์สินค้าที่ขอคืนเงิน'],['รุ่นสินค้า','text','',1,'รุ่นสินค้าที่ขอคืนเงิน'],['สาเหตุขอคืนเงิน','radio+','สาเหตุ REFUND',1,'สาเหตุขอคืนเงินค่าสินค้า']]],
+ ['2. การคืนเงิน','',[['วิธีคืนเงิน','radio+','วิธีคืนเงิน REFUND',1,'ลูกค้ามีความประสงค์ขอคืนเงินจากบริษัทฯ'],['จำนวนเงินที่ขอคืน','number','',1,'จำนวนเงินที่ขอคืน (บาท)'],['ชื่อบัญชี/ชื่อผู้ถือบัตร','text','',1],['ประเภทบัญชี','radio+','ประเภทบัญชี REFUND',1],['เลขที่บัญชี/เลขที่บัตรเครดิต','text','',1],['ธนาคาร','radio+','ธนาคาร REFUND',1]]],
+ ['ความเห็นและผู้อนุมัติ','',[['ผู้แจ้งขอคืนเงิน','text','',1,'ชื่อผู้แจ้งขอคืนเงิน'],['เบอร์ติดต่อผู้แจ้ง','tel','',0,'ไว้ติดต่อกลับหากข้อมูลไม่ครบ'],['ความเห็นของพนักงาน','area','',1],['ผู้เซ็นอนุมัติ','check','appr',1,'ผู้เซ็นอนุมัติ (ได้มากกว่า 1 ท่าน)'],['หัวหน้าผู้เซ็นอนุมัติ','radio','หัวหน้าอนุมัติ REFUND',0,'หัวหน้าผู้เซ็นอนุมัติ (สังกัดของเจ้าหน้าที่ผู้ขออนุมัติ)']]]];
+const ALL=[];SECS.forEach(s=>s[2].forEach(f=>ALL.push(f)));
+const idOf=h=>'q'+ALL.findIndex(f=>f[0]===h);
+function q([h,t,list,req,lab]){const id=idOf(h);const L=list==='appr'?O.appr:(O[list]||[]);const nm=id+'_v';let c;
+  if(t==='radio'||t==='radio+')c=`<div class="opts ${L.length>5?'c2':''}">${L.map(o=>`<label class="opt"><input type="radio" name="${nm}" value="${esc(o)}">${esc(o)}</label>`).join('')}${t==='radio+'?`<label class="opt other"><input type="radio" name="${nm}" value="__other">อื่นๆ: <input type="text" id="${id}_o" placeholder="ระบุ" oninput="this.closest('.opt').querySelector('input[type=radio]').checked=true"></label>`:''}</div>`;
+  else if(t==='check')c=`<div class="opts">${L.map(o=>`<label class="opt"><input type="checkbox" name="${nm}" value="${esc(o)}">${esc(o)}</label>`).join('')}</div>`;
+  else if(t==='select')c=`<select id="${id}"><option value="">เลือก</option>${L.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`;
+  else if(t==='area')c=`<textarea id="${id}" maxlength="3000"></textarea>`;
+  else c=`<input type="${t==='number'?'text':t}" id="${id}" ${t==='number'?'inputmode="decimal" placeholder="เช่น 3,298"':''} ${t==='date'?`value="${O.today}"`:''} maxlength="300" autocomplete="off">`;
+  return `<div class="q" id="w_${id}"><label class="t" for="${id}">${esc(lab||h)}${req?' <b>*</b>':''}</label>${c}<div class="err">กรุณากรอกช่องนี้</div></div>`;}
+function form(){$('#app').innerHTML=`<div class="card head"><h1>New MEMO / REFUND INFORMATION</h1><p>แบบฟอร์มแจ้งขอคืนเงินลูกค้า · ข้อมูลจะส่งเข้าระบบ CS DATA โดยตรง · <span style="color:var(--bad)">*</span> จำเป็นต้องกรอก</p></div>
+  <form id="f" novalidate>${SECS.map(s=>`<div class="card"><div class="sec">${esc(s[0])}</div>${s[2].map(q).join('')}</div>`).join('')}
+  <div class="hp" aria-hidden="true"><label>เว้นว่าง<input type="text" id="hp" tabindex="-1" autocomplete="off"></label></div>
+  <div class="bar"><button class="btn" id="sb" type="submit">ส่ง</button><button class="btn g" type="button" onclick="if(confirm('ล้างข้อมูลทั้งหมดในฟอร์ม?'))form()">ล้างแบบฟอร์ม</button></div></form>
+  <p class="foot">ข้อมูลในฟอร์มนี้ใช้เพื่อดำเนินการคืนเงินเท่านั้น · ผู้กรอกไม่สามารถดูข้อมูลที่ส่งไปแล้ว</p>`;
+  $('#f').addEventListener('submit',e=>{e.preventDefault();send();});
+  $('#f').addEventListener('input',e=>{const w=e.target.closest('.q');if(w)w.classList.remove('bad');});
+  $('#f').addEventListener('change',e=>{const w=e.target.closest('.q');if(w)w.classList.remove('bad');});}
+function val([h,t]){const id=idOf(h),nm=id+'_v';
+  if(t==='radio'||t==='radio+'){const r=document.querySelector(`input[name="${nm}"]:checked`);if(!r)return '';return r.value==='__other'?$('#'+id+'_o').value.trim():r.value;}
+  if(t==='check')return [...document.querySelectorAll(`input[name="${nm}"]:checked`)].map(x=>x.value);
+  return $('#'+id).value.trim();}
+function send(){const d={_hp:$('#hp').value};let first=null;
+  ALL.forEach(f=>{const v=val(f);d[f[0]]=v;const w=$('#w_'+idOf(f[0]));let bad=f[3]&&(!v||(Array.isArray(v)&&!v.length));
+    if(!bad&&f[0]==='จำนวนเงินที่ขอคืน'&&v){const n=Number(String(v).replace(/,/g,''));bad=!(n>0);if(bad)w.querySelector('.err').textContent='กรอกตัวเลขจำนวนเงินมากกว่า 0';}
+    if(!bad&&f[1]==='tel'&&v&&String(v).replace(/\D/g,'').length<9){bad=true;w.querySelector('.err').textContent='เบอร์โทรไม่ครบ';}
+    w.classList.toggle('bad',!!bad);if(bad&&!first)first=w;});
+  if(first){first.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  const b=$('#sb');b.disabled=true;b.textContent='กำลังส่ง…';
+  google.script.run.withSuccessHandler(r=>{window.scrollTo(0,0);
+    $('#app').innerHTML=`<div class="card head"><h1>New MEMO / REFUND INFORMATION</h1></div><div class="card done"><div class="ic">✓</div><h2>ส่งข้อมูลเรียบร้อยแล้ว</h2>
+     <p style="margin:0;color:var(--mut)">ระบบบันทึกคำขอคืนเงินของคุณเข้าสู่ CS DATA แล้ว เจ้าหน้าที่จะดำเนินการต่อ</p>
+     ${r&&r.no?`<div class="no">${esc(r.no)}</div><p style="margin:0;color:var(--mut);font-size:14px">เลขที่ MEMO สำหรับอ้างอิง · ส่งเมื่อ ${esc(r.at||'')} น.</p>`:''}
+     <p style="margin-top:22px"><button class="btn" onclick="form()">ส่งคำขออีกรายการ</button></p></div>`;})
+   .withFailureHandler(e=>{b.disabled=false;b.textContent='ส่ง';alert('ส่งไม่สำเร็จ: '+(e&&e.message||e));}).refundSubmit(d);}
+google.script.run.withSuccessHandler(o=>{O=o;form();}).withFailureHandler(e=>{$('#app').innerHTML='<div class="card head"><h1>ไม่สามารถเปิดแบบฟอร์มได้</h1><p>'+esc(e&&e.message||e)+'</p></div>';}).refundFormOpts();
+</script></body></html>
