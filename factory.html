@@ -739,7 +739,7 @@ async function doLogin(){const code=$('#lgCode').value.trim(),pin=$('#lgPin').va
   if(LSTEP==='setup'&&pin!==pin2){$('#lgMsg').textContent='PIN ทั้งสองช่องไม่ตรงกัน';return;}
   $('#lgBtn').disabled=true;
   try{const r=await TP.gs('login',p);
-    if(r.needSetup){LSTEP='setup';$('#lgPin2Row').hidden=false;$('#lgBtn').textContent='ตั้ง PIN และเข้าสู่ระบบ';$('#lgMsg').textContent='ครั้งแรก: ตั้ง PIN 4–8 หลัก';return;}
+    if(r.needSetup){LSTEP='setup';$('#lgPin2Row').hidden=false;$('#lgBtn').textContent='ตั้ง PIN และเข้าสู่ระบบ';$('#lgMsg').textContent='ครั้งแรก: ตั้ง PIN 6–8 หลัก (ห้ามเลขซ้ำ/เลขเรียง)';return;}
     if(r.error){$('#lgMsg').textContent=r.error;return;}
     TP.setTok(r.token);start();}
   catch(e){$('#lgMsg').textContent=e.message;}finally{$('#lgBtn').disabled=false;}}

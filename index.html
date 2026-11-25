@@ -344,7 +344,7 @@ body.app.sbmin nav#nav a.sbx span{display:none}
     <div class="lgx-card fu" style="animation-delay:.6s">
      <div id="lgTitle" class="lgx-h">เข้าสู่ระบบ</div>
      <label for="lgCode">รหัสพนักงาน</label><input id="lgCode" placeholder="เช่น LT00505" autocomplete="username" onkeydown="if(event.key==='Enter')$('#lgPin').focus()">
-     <label for="lgPin">PIN</label><input id="lgPin" type="password" inputmode="numeric" placeholder="ตัวเลข 4–8 หลัก" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+     <label for="lgPin">PIN</label><input id="lgPin" type="password" inputmode="numeric" placeholder="PIN ของคุณ" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
      <div id="lgPin2Row" style="display:none"><label for="lgPin2">ยืนยัน PIN</label><input id="lgPin2" type="password" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()"></div>
      <div id="lgMsg" class="lgx-msg"></div>
      <button class="lgx-btn" id="lgBtn" onclick="doLogin()">เข้าสู่ระบบ</button>
@@ -416,12 +416,12 @@ body.app.sbmin nav#nav a.sbx span{display:none}
 <p>แต่ละคนจะเห็นเมนูไม่เท่ากัน ขึ้นกับสิทธิ์ที่ได้รับ (ดูหัวข้อ 3) ยกเว้นเมนู "คู่มือการใช้งาน" ที่ทุกคนเห็น</p>
 <p><strong>ข้อมูลบนเว็บกับชีตเป็นชุดเดียวกัน:</strong> แก้บนเว็บ ชีตเปลี่ยนทันที แก้ในชีตโดยตรง เว็บจะเห็นค่าใหม่เมื่อกด "รีเฟรช" หรือเปิดหน้าใหม่</p>
 <h2>2. การเข้าสู่ระบบ</h2>
-<p>ทุกคนเข้าด้วย <strong>รหัสพนักงาน + PIN ตัวเลข 4–8 หลัก</strong> รหัสพนักงานต้องมีอยู่ในหน้า ทีม / สิทธิ์ ก่อน</p>
+<p>ทุกคนเข้าด้วย <strong>รหัสพนักงาน + PIN ตัวเลข 6–8 หลัก</strong> (PIN เดิมที่ตั้งไว้แล้วใช้ต่อได้) รหัสพนักงานต้องมีอยู่ในหน้า ทีม / สิทธิ์ ก่อน</p>
 <p><strong>เข้าครั้งแรก (ตั้ง PIN)</strong></p>
 <ol>
 <li>เปิดลิงก์ระบบ กรอกรหัสพนักงาน เช่น LT00505 (ช่อง PIN เว้นว่างได้)</li>
 <li>กด "เข้าสู่ระบบ" ระบบจะขึ้น "ตั้ง PIN ครั้งแรก" พร้อมชื่อของคุณ</li>
-<li>กรอก PIN ตัวเลข 4–8 หลัก และกรอกซ้ำในช่อง "ยืนยัน PIN"</li>
+<li>ถ้ายังไม่เคยตั้ง PIN ต้องให้ ADMIN SYSTEM กด "เปิดให้ตั้ง PIN" ให้ก่อน (เปิดไว้ 72 ชม.)</li><li>กรอก PIN ตัวเลข 6–8 หลัก (ห้ามเลขซ้ำ/เลขเรียง เช่น 111111, 123456) และกรอกซ้ำในช่อง "ยืนยัน PIN"</li>
 <li>กด "ตั้ง PIN และเข้าสู่ระบบ"</li>
 </ol>
 <p><strong>เข้าครั้งต่อไป:</strong> กรอกรหัสพนักงาน + PIN แล้วกด Enter ระบบจำการเข้าสู่ระบบไว้ 30 วัน บนเครื่องเดิม</p>
@@ -873,18 +873,20 @@ function showLogin(msg){lgVideo();try{if(sessionStorage.getItem('cs_idle')){sess
 async function doLogin(){const code=$('#lgCode').value.trim(),pin=$('#lgPin').value.trim(),pin2=$('#lgPin2').value.trim();
   if(!code)return $('#lgMsg').textContent='กรุณากรอกรหัสพนักงาน';
   const payload={code};
-  if(LOGIN_STEP==='setup'){if(!/^\d{4,8}$/.test(pin))return $('#lgMsg').textContent='PIN ต้องเป็นตัวเลข 4–8 หลัก';if(pin!==pin2)return $('#lgMsg').textContent='PIN ทั้งสองช่องไม่ตรงกัน';payload.newPin=pin;}
+  if(LOGIN_STEP==='setup'){if(!/^\d{6,8}$/.test(pin))return $('#lgMsg').textContent='PIN ต้องเป็นตัวเลข 6–8 หลัก';if(pin!==pin2)return $('#lgMsg').textContent='PIN ทั้งสองช่องไม่ตรงกัน';payload.newPin=pin;}
   else payload.pin=pin;
   $('#lgBtn').disabled=true;$('#lgMsg').textContent='กำลังตรวจสอบ…';
   try{const j=await TP.login(payload);
-    if(j.needSetup){LOGIN_STEP='setup';$('#lgPin2Row').style.display='';$('#lgTitle').textContent='ตั้ง PIN ครั้งแรก ('+(j.name||code)+')';$('#lgBtn').textContent='ตั้ง PIN และเข้าสู่ระบบ';$('#lgMsg').textContent='ยังไม่เคยตั้ง PIN — กรุณาตั้ง PIN ตัวเลข 4–8 หลัก';$('#lgPin').value='';$('#lgPin').focus();}
+    if(j.needSetup){LOGIN_STEP='setup';$('#lgPin2Row').style.display='';$('#lgTitle').textContent='ตั้ง PIN ครั้งแรก ('+(j.name||code)+')';$('#lgBtn').textContent='ตั้ง PIN และเข้าสู่ระบบ';$('#lgMsg').textContent='ยังไม่เคยตั้ง PIN — กรุณาตั้ง PIN ตัวเลข 6–8 หลัก (ห้ามเลขซ้ำ/เลขเรียง)';$('#lgPin').value='';$('#lgPin').focus();}
     else if(j.ok){window.__idleMsg='';idleMark();if(j.token)TP.setTok(j.token);$('#lgPin').value='';$('#lgPin2').value='';$('#lgMsg').textContent='';startApp();}
     else $('#lgMsg').textContent=j.error||'เข้าสู่ระบบไม่สำเร็จ';
   }catch(e){$('#lgMsg').textContent='ติดต่อเซิร์ฟเวอร์ไม่ได้: '+e.message;}
   $('#lgBtn').disabled=false;}
 async function logout(){await TP.logout();location.reload();}
-async function resetPin(code){if(!confirm('รีเซ็ต PIN ของ '+code+' ? (ผู้ใช้จะต้องตั้ง PIN ใหม่ตอนเข้าสู่ระบบครั้งถัดไป)'))return;
-  await run('resetPin',code);toast('รีเซ็ต PIN แล้ว','ok');}
+async function resetPin(code,st){if(!confirm((st==='set'?'รีเซ็ต PIN ของ '+code+' ?\n(PIN เดิมใช้ไม่ได้ทันที + ออกจากระบบทุกเครื่อง)':'เปิดให้ '+code+' ตั้ง PIN ?')+'\nผู้ใช้ต้องเข้ามาตั้ง PIN ใหม่ภายใน 72 ชม. ไม่งั้นจะถูกล็อกอีกครั้ง'))return;
+  await run('resetPin',code);toast('เปิดให้ตั้ง PIN แล้ว (72 ชม.)','ok');closeModal();}
+const PIN_ST={set:['ตั้ง PIN แล้ว','#16a34a'],open:['เปิดให้ตั้ง PIN แล้ว — รอผู้ใช้ตั้ง','#d97706'],none:['ยังไม่มี PIN — ถูกล็อก เข้าระบบไม่ได้','#dc2626']};
+function pinBadge(st){const x=PIN_ST[st]||PIN_ST.none;return `<div class="noprint" style="margin-bottom:8px;font-weight:600;color:${x[1]}">สถานะ PIN: ${x[0]}</div>`;}
 const SB_ICO={DASH:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
 FAC:'<path d="M3 21V10l6 4V10l6 4V6l6 4v11z"/><path d="M7 17h2M12 17h2M17 17h2"/>',
 SCHED:'<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M7.5 14h3M13.5 14h3M7.5 17.5h3"/>',
@@ -1739,8 +1741,8 @@ function openRec(m,key){if(!BOOT.modules[m])return;const M=BOOT.modules[m];
         ${canWrite('SPARE')?`<div style="margin-top:8px"><button class="btn g sm" onclick="spareDlg('dispatch','', '${esc(R.svoNo||key)}')">ส่งที่นอนสำรองให้ SVO นี้</button></div>`:''}
         ${R.spareLog&&R.spareLog.length?`<div class="hint" style="margin-top:6px">ประวัติ: ${R.spareLog.map(l=>`${dshow(l['วันที่'])} ${esc(l['รายการ'])} ${esc(l['Serial'])}`).join(' · ')}</div>`:''}</fieldset>`:'');}
     if(m==='SPARE'&&R.spareLog&&R.spareLog.length)rel=`<fieldset><legend>ประวัติหมุนเวียน</legend><table><tr><th>วันที่</th><th>รายการ</th><th>SVO</th><th>TR</th><th>โดย</th></tr>${R.spareLog.reverse().map(l=>`<tr><td>${dshow(l['วันที่'])}</td><td>${esc(l['รายการ'])}</td><td>${esc(l['SVO'])}</td><td>${esc(l['TR'])}</td><td>${esc(l['ผู้ทำรายการ'])}</td></tr>`).join('')}</table></fieldset>`;
-    $('#mBody').innerHTML='<div id="dupWarn"></div>'+(m==='SVO'&&R.factory?facPanel(R.factory):'')+fm.html+rel;
-    $('#mFoot').innerHTML=`${canDel(m)?`<button class="btn r" style="margin-right:auto" onclick="del()">ลบ</button>`:''}${isAdmin()&&m==='TEAM'?`<button class="btn g" onclick="resetPin('${esc(key)}')">รีเซ็ต PIN</button>`:''}${m==='REFUND'?rfFoot(r.rec):''}<button class="btn g" onclick="window.print()">พิมพ์</button><button class="btn g" onclick="closeModal()">ปิด</button>${canWrite(m)?`<button class="btn" id="bSave" onclick="save()">บันทึกการแก้ไข</button>`:''}`;
+    $('#mBody').innerHTML='<div id="dupWarn"></div>'+(m==='TEAM'&&isAdmin()&&r.rec?pinBadge(r.rec._pin):'')+(m==='SVO'&&R.factory?facPanel(R.factory):'')+fm.html+rel;
+    $('#mFoot').innerHTML=`${canDel(m)?`<button class="btn r" style="margin-right:auto" onclick="del()">ลบ</button>`:''}${isAdmin()&&m==='TEAM'?`<button class="btn g" onclick="resetPin('${esc(key)}','${esc(r.rec._pin||'')}')">${r.rec._pin==='set'?'รีเซ็ต PIN':'เปิดให้ตั้ง PIN'}</button>`:''}${m==='REFUND'?rfFoot(r.rec):''}<button class="btn g" onclick="window.print()">พิมพ์</button><button class="btn g" onclick="closeModal()">ปิด</button>${canWrite(m)?`<button class="btn" id="bSave" onclick="save()">บันทึกการแก้ไข</button>`:''}`;
     hookDup(M);});}
 function newAR(svo){closeModal();go('AR');
   setTimeout(()=>{newRec();const e=document.getElementById(EDIT.ids['อ้างอิง SVO']);if(e)e.value=svo;},50);}
