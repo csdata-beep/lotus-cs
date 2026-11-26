@@ -338,7 +338,7 @@ nav.side a.sx svg{width:19px;height:19px;flex:none;fill:none;stroke:currentColor
 @media(max-width:520px){.irkv{grid-template-columns:110px 1fr}.irph{grid-template-columns:repeat(2,1fr)}.irb{padding:8px}.irp{padding:8px}.irft .btn{flex:1}}
 /* หน้า A4 ของเอกสาร */
 .irpg{width:794px;height:1123px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.18);position:relative;padding:0 64px 40px;font-family:Sarabun,Calibri,Arial,sans-serif;color:#000;font-size:12.5px;line-height:1.38;overflow:hidden;margin-bottom:16px;text-align:left}
-.irpg .hdr{display:block;width:calc(100% + 40px);margin:14px -20px 6px}
+.irpg .hdr{display:block;width:calc(100% + 40px);max-height:175px;object-fit:contain;margin:14px -20px 6px}
 .irpg h4{margin:12px 0 3px;font-size:12.5px;font-weight:700}
 .irpg .irr{display:grid;grid-template-columns:150px 16px 1fr}
 .irpg th,.irpg td{background:#fff;color:#000;font-size:12.5px;font-weight:400;white-space:normal;border-top:0;line-height:1.35}
@@ -368,6 +368,13 @@ nav.side a.sx svg{width:19px;height:19px;flex:none;fill:none;stroke:currentColor
 .irpg .sumtbl td,.irpg .sumtbl th{border:1px solid #999;padding:3px 6px;text-align:center}
 .irpg .sumtbl td:first-child{text-align:left}
 .irpg .verdict{margin:14px auto 0;text-align:center;font-size:14px;font-weight:700;border:2px solid currentColor;border-radius:6px;padding:6px 10px;width:max-content}
+.hdr-row{display:grid;grid-template-columns:220px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.hdr-img{background:#fff;border:1px solid var(--line);border-radius:10px;min-height:56px;display:grid;place-items:center;overflow:hidden}
+.hdr-img img{width:100%;display:block}
+.hdr-act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.hdr-prev{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}.hdr-prev img{width:100%;display:block}
+.hdr-warn{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:8px 10px;font-size:13px}
+@media(max-width:820px){.hdr-row{grid-template-columns:1fr}.hdr-act{justify-content:flex-start}}
 </style>
 </head><body>
 <div id="login" hidden><form class="box" onsubmit="event.preventDefault();doLogin()"><h1>CS Factory &amp; QC</h1><p>เว็บแอปโรงงาน · ใช้รหัสพนักงานและ PIN เดียวกับ CS DATA SYSTEM</p>
@@ -435,6 +442,7 @@ const ICO={
   doc:'<path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5M8.5 13h7M8.5 17h5"/>',
   all:'<path d="M4 6h16M4 12h16M4 18h10"/>',
   truck:'<path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+  img:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 13h6M7 16h10"/>',
   more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
   cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
   flow:'<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="12" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8.5 6H13a3 3 0 0 1 3 3v.5M8.5 18H13a3 3 0 0 0 3-3v-.5"/>'
@@ -449,6 +457,7 @@ const PAGES=[
   ['wait','wait','ที่นอนรอซ่อม (รับเข้ามาแล้ว)','รอซ่อม','QC','QC'],
   ['repair','cs','ที่นอนซ่อม','ซ่อม','QC','QC'],
   ['doc','doc','รอเอกสารการตรวจสอบ','เอกสาร','QC','QC'],
+  ['hdr','img','หัวกระดาษเอกสาร','หัวกระดาษ','QC','QC'],
   ['all','all','เคสทั้งหมด / ค้นหา','ทั้งหมด','ข้อมูล',''],
   ['flow','flow','ผังสถานะ & วิธีใช้','ผังสถานะ','ข้อมูล','']
 ];
@@ -476,7 +485,8 @@ function setMode(m){if(!BOTH()||MODE===m)return;MODE=m;try{localStorage.setItem(
   const map={dcs:'dqc',inb:'wait',send:'wait',back:'repair',dqc:'dcs',wait:'inb',repair:'send',doc:'back'};
   if(!pagesAllowed().some(p=>p[0]===VIEW))VIEW=map[VIEW]||pagesAllowed()[0][0];render();window.scrollTo(0,0);toast('สลับเป็นมุมมอง '+(m==='CS'?'CS โรงงาน':'QC'));}
 const dis=side=>canE(side)?'':`disabled title="${P&&P[side]&&P[side].see?'บัญชีนี้ดูอย่างเดียว':'สำหรับ '+(side==='CS'?'CS โรงงาน':'QC')}"`;
-function pagesAllowed(){return PAGES.filter(p=>!p[5]||sideOn(p[5]));}
+function pagesAllowed(){return PAGES.filter(p=>(!p[5]||sideOn(p[5]))&&(p[0]!=='hdr'||hdrAdm()));}
+const hdrAdm=()=>!!B&&(B.user.role==='ADMIN SYSTEM'||canDel('QC'));
 function bottomKeys(){return sideOn('CS')?['dcs','inb','send','back','deliv']:['dqc','wait','repair','doc'];}
 function toCase(c){return Object.assign({},c,{pickupD:pd(c.pickup),recvD:pd(c.recvAt),sentD:pd(c.sentAt),startD:pd(c.startAt),doneD:pd(c.doneAt),backD:pd(c.backAt)});}
 /* ---------- metrics ---------- */
@@ -506,7 +516,7 @@ function moreSheet(){const m=M();const rest=pagesAllowed().filter(p=>!bottomKeys
     ${B.app1Url?`<a class="it" href="${esc(B.app1Url)}" target="_top">↩ กลับเว็บหลัก (CS DATA SYSTEM)</a>`:''}<button type="button" class="it" onclick="closeSheet();logout()">ออกจากระบบ</button></div></div>`);}
 function closeSheet(){const e=$('#sheet');if(e)e.remove();}
 function go(k){if(!pagesAllowed().some(p=>p[0]===k))k=pagesAllowed()[0][0];VIEW=k;try{sessionStorage.setItem('fac_view',k);}catch(e){}render();window.scrollTo(0,0);}
-function render(){if(!B)return;renderShell();const f={deliv:vDeliv,dcs:vDashCS,dqc:vDashQC,inb:vInb,send:vSend,back:vBack,wait:vWait,repair:vRepair,doc:vDoc,all:vAll,flow:vFlow}[VIEW];$('#view').innerHTML=f();}
+function render(){if(!B)return;renderShell();const f={deliv:vDeliv,dcs:vDashCS,dqc:vDashQC,inb:vInb,send:vSend,back:vBack,wait:vWait,repair:vRepair,doc:vDoc,hdr:vHdr,all:vAll,flow:vFlow}[VIEW];$('#view').innerHTML=f();}
 const pill=c=>{const s=ST(c.stage);return `<span class="pill ${s.cls}">${s.t}</span>`};
 const docPill=c=>!c.docReq?'':c.docSt==='sent'?'<span class="pill p-docok">ส่งเอกสารแล้ว</span>':c.docSt==='issued'?'<span class="pill p-doc">เอกสารรอส่งลูกค้า</span>':'<span class="pill p-doc">ลูกค้าขอเอกสาร</span>';
 const rwPill=c=>c.rework?`<span class="pill p-bad">ซ่อมซ้ำ ×${c.rework}</span>`:'';
@@ -799,7 +809,13 @@ const irToday=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMon
 function irIssueEn(t){t=String(t||'');if(!t)return '';if(!/[฀-๿]/.test(t))return t;const m=IR_ISSUE.find(x=>x[0].test(t));return m?m[1]:t;}
 function irSvc(a,b){if(!a||!b)return '';let y=b.getFullYear()-a.getFullYear(),m=b.getMonth()-a.getMonth(),d=b.getDate()-a.getDate();
   if(d<0){m--;d+=new Date(b.getFullYear(),b.getMonth(),0).getDate();}if(m<0){y--;m+=12;}return y<0?'':`${y} Year ${m} Month ${d} Day`;}
-function irHdrKey(){if(IR.hdr!=='auto')return IR.hdr;return /^BG\b|BEDGEAR/i.test(IR.d.brand||'')?'bg':'lotus';}
+const irBuiltin=()=>/^BG\b|BEDGEAR/i.test(IR.d.brand||'')?'bg':'lotus';
+function irHdrSrc(){const h=IR.hdr||'auto';
+  if(h==='auto')return IR.hdrAuto||IR_HDR[irBuiltin()];
+  if(h.indexOf('c:')===0)return IR.hdrImg[h]||IR.hdrAuto||IR_HDR[irBuiltin()];
+  return IR_HDR[h]||IR_HDR.lotus;}
+async function irHdrLoad(h){if(!IR||!h||h.indexOf('c:')!==0||IR.hdrImg[h]!==undefined)return;IR.hdrImg[h]='';
+  try{const r=await call('facHdrImg',h.slice(2),true);if(IR)IR.hdrImg[h]=r&&r.b64?'data:'+r.mime+';base64,'+r.b64:'';}catch(e){}}
 function irSec1(){const d=IR.d,st=irPd(d.start),wy=irNum(IR.wy);let end=irPd(d.end);
   if(!end&&st&&wy){end=new Date(st);end.setMonth(end.getMonth()+wy*12);}
   return [['Claim No',d.svo],['Product type',IR.type],['Customer Name',d.name],['Product Description',[d.brand,d.model,d.size].filter(Boolean).join(' ').replace(/^(\S+) (\S)/,'$1 : $2')],
@@ -825,6 +841,8 @@ async function actDocIssue(key){const c=caseByKey(key);closeModal();
       a:sv.a||[d.user||'','','',''],hdr:sv.hdr||'auto',g:sv.g!==false,failOk:false,
       ph:d.photos.map((p,j)=>({fid:p.fid,cap:p.cap,stage:p.stage,on:sv.ph?sv.ph.indexOf(p.fid)>=0:false,th:'',full:''}))};
     if(!sv.ph){const q=IR.ph.filter(p=>p.stage==='QC'),r=IR.ph.filter(p=>p.stage!=='QC');q.concat(r).slice(0,4).forEach(p=>p.on=true);}
+    IR.hdrImg={};IR.hdrAuto='';if(IR.hdr.indexOf('c:')===0&&(d.hdrs||[]).indexOf(IR.hdr.slice(2))<0)IR.hdr='auto';
+    IR.hdrP=Promise.all([call('facHdrImg',d.brand,false).then(r=>{if(IR&&IR.key===key){IR.hdrAuto=r&&r.b64?'data:'+r.mime+';base64,'+r.b64:'';}}).catch(()=>{}),irHdrLoad(IR.hdr)]).then(()=>{if(IR&&IR.key===key)irRender();});
     irForm();irRender();$('#irdl').disabled=false;$('#irok').disabled=false;irThumbs();
   }catch(e){$('#irf').innerHTML=`<div class="err">${esc(e.message)}</div>`;}}
 function irClose(){const v=$('#irv');if(v&&!v.dataset.busy)v.remove();IR=null;}
@@ -851,7 +869,7 @@ function irForm(){const d=IR.d;
      :'<div class="note">เคสนี้ยังไม่มีรูปขั้นซ่อม/QC · เพิ่มรูปได้จากหน้าเคส (ขั้น QC) แล้วกลับมาออกเอกสาร</div>'}</fieldset>
   <fieldset><legend>ผู้ลงนาม &amp; รูปแบบ</legend>
    <div class="irg2">${['Prepared by','Reviewed by','Consolidated by','Approved by'].map((l,j)=>`<div class="fld"><label>${l}</label><input data-a="${j}" value="${esc(IR.a[j]||'')}"></div>`).join('')}</div>
-   <div class="fld"><label>หัวกระดาษ</label><select data-s="hdr"><option value="auto">อัตโนมัติตามแบรนด์ (${esc(d.brand||'-')})</option><option value="bg">Bedgear</option><option value="lotus">Lotus</option></select></div>
+   <div class="fld"><label>หัวกระดาษ</label><select data-s="hdr"><option value="auto">อัตโนมัติตามแบรนด์ (${esc(d.brand||'-')})</option>${(d.hdrs||[]).map(k=>`<option value="c:${esc(k)}">${k==='*'?'หัวกระดาษกลาง':'หัวกระดาษ '+esc(k)}</option>`).join('')}<option value="bg">Bedgear (ในระบบ)</option><option value="lotus">Lotus (ในระบบ)</option></select></div>
    <label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:13px"><input type="checkbox" style="width:auto" data-s="g" ${IR.g?'checked':''}> แนบหน้า 2: กราฟเปรียบเทียบผลทดสอบ</label></fieldset>`;
   $('#irf [data-s="hdr"]').value=IR.hdr;
   $('#irf').oninput=irInput;$('#irf').onchange=irChange;
@@ -871,7 +889,7 @@ function irInput(e){const t=e.target;if(!IR)return;IR.failOk=false;
   if(t.dataset.f){IR.tests[+t.dataset.j][t.dataset.f]=t.value;irRes();irRender();}}
 function irChange(e){const t=e.target;if(!IR)return;
   if(t.dataset.ph!=null){const p=IR.ph[+t.dataset.ph];if(t.checked&&IR.ph.filter(x=>x.on).length>=4){t.checked=false;toast('เลือกรูปได้สูงสุด 4 รูป');return;}p.on=t.checked;t.closest('label').classList.toggle('on',p.on);irRender();if(p.on)irFull(p).then(()=>IR&&irRender()).catch(()=>{});return;}
-  if(t.dataset.s==='hdr'){IR.hdr=t.value;irRender();return;}
+  if(t.dataset.s==='hdr'){IR.hdr=t.value;irRender();irHdrLoad(IR.hdr).then(()=>IR&&irRender());return;}
   if(t.dataset.s==='g'){IR.g=t.checked;irRender();}}
 function irThumbs(){const key=IR.key;IR.ph.forEach((p,j)=>{const put=src=>{const l=document.querySelectorAll('#irph label')[j];if(l)l.firstElementChild.outerHTML=`<img src="${src}" alt="">`;};
   if(THUMB[p.fid]&&THUMB[p.fid].b64){p.th='data:'+THUMB[p.fid].mime+';base64,'+THUMB[p.fid].b64;put(p.th);if(p.on)irRender();}
@@ -893,11 +911,11 @@ function irChart(unit,init,ret,lo,hi,min,max,ticks){
 const irSvgUrl=s=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
 function irPng(svg){return new Promise(res=>{const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=im.naturalWidth||1280;c.height=im.naturalHeight||460;c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/png'));}catch(e){res(irSvgUrl(svg));}};im.onerror=()=>res(irSvgUrl(svg));im.src=irSvgUrl(svg);});}
 
-async function irPages(pdf){const d=IR.d,hk=irHdrKey(),s1=irSec1();
+async function irPages(pdf){const d=IR.d,hsrc=irHdrSrc(),s1=irSec1();
   const rows=IR.tests.map(t=>{const e=irEval(t);return{name:t.name,init:e.init,ret:t.r,acc:e.acc,ev:e.ev};});
   const phs=IR.ph.filter(p=>p.on).slice(0,4);const st=irState();const np=IR.g?2:1;
   const foot=n=>`<div class="foot"><span>Generated from CS DATA · ${esc(d.svo)}</span><span>Page ${n} / ${np}</span></div>`;
-  const p1=`<div class="irpg"><img class="hdr" src="${IR_HDR[hk]}" alt="">
+  const p1=`<div class="irpg"><img class="hdr" src="${hsrc}" alt="">
    <h4 style="margin-top:0">SECTION 1: PRODUCT CLAIM DETAILS</h4>${s1.map(([k,v])=>`<div class="irr"><span>${esc(k)}</span><span>:</span><span>${esc(v)}</span></div>`).join('')}
    <h4>SECTION 2: PRODUCT INSPECTION &amp; CORRECTIVE ACTION (Production Department)</h4>
    <div class="irr"><span>Defect Location</span><span>:</span><span>${esc(IR.s2a||'-')}</span></div><div class="irr"><span>Resolution</span><span>:</span><span>${esc(IR.s2b||'-')}</span></div><div class="irr"><span>Additional Details</span><span>:</span><span>${esc(IR.s2c||'-')}</span></div>
@@ -920,7 +938,7 @@ async function irPages(pdf){const d=IR.d,hk=irHdrKey(),s1=irSec1();
   const cF=fi!=null?`<img src="${await img(irChart('Level (0-10)',fi,fr,fi-tf,fi+tf,0,10,[0,2,4,6,8,10]))}" alt="">`:'<div class="ref">ยังไม่ได้กรอกค่า Firmness</div>';
   const cH=hi!=null?`<img src="${await img(irChart('Inch',hi,hr,hi-th,hMax,hMin,hMax,hT))}" alt="">`:'<div class="ref">ยังไม่ได้กรอกค่า Height</div>';
   const lg=t=>`<div class="legend"><span><i style="background:#1F4E78"></i>Initial</span><span><i style="background:#4a9b6e"></i>Returned</span><span><i style="background:#d9f0e1;border:1px dashed #2e8b57"></i>Acceptance ${t}</span></div>`;
-  const p2=`<div class="irpg"><img class="hdr" src="${IR_HDR[hk]}" alt=""><div class="gtitle">Graphical Representation of Test Results</div>
+  const p2=`<div class="irpg"><img class="hdr" src="${hsrc}" alt=""><div class="gtitle">Graphical Representation of Test Results</div>
    <div class="chart"><h5>1) Firmness (level) — Initial vs Returned</h5>${cF}${lg(fi!=null?ir1(fi-tf)+' - '+ir1(fi+tf):'')}</div>
    <div class="chart"><h5>2) Height (Inch) — Initial vs Returned</h5>${cH}${lg(hi!=null?'≥ '+ir1(hi-th).toFixed(1):'')}</div>
    <table class="sumtbl"><tr><th>Test item</th><th>Initial</th><th>Returned</th><th>Change</th><th>Evaluation</th></tr>
@@ -938,7 +956,7 @@ function irLoadJs(src){return new Promise((ok,no)=>{const s=document.createEleme
 async function irLibs(){const cdn='https:\/\/cdnjs.cloudflare.com/ajax/libs/';
   if(!window.html2canvas)await irLoadJs(cdn+'html2canvas/1.4.1/html2canvas.min.js');
   if(!(window.jspdf&&window.jspdf.jsPDF))await irLoadJs(cdn+'jspdf/2.5.1/jspdf.umd.min.js');}
-async function irPdf(){await irLibs();for(const p of IR.ph.filter(x=>x.on).slice(0,4)){try{await irFull(p);}catch(e){}}
+async function irPdf(){await irLibs();try{await IR.hdrP;await irHdrLoad(IR.hdr);}catch(e){}for(const p of IR.ph.filter(x=>x.on).slice(0,4)){try{await irFull(p);}catch(e){}}
   const host=document.createElement('div');host.style.cssText='position:fixed;left:-12000px;top:0;width:794px';host.innerHTML=await irPages(true);document.body.appendChild(host);
   try{await Promise.all([...host.querySelectorAll('img')].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r;})));
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
@@ -967,6 +985,38 @@ async function irIssue(){const err=$('#irerr');err.textContent='';
     irBusy(false);irClose();toast('ออกเอกสารผลตรวจแล้ว · แนบ PDF เข้าเคส · รอ CS โรงงานส่งลูกค้า');await reload();if(OPEN===key)openCase(key);}
   catch(e){err.textContent=e.message||String(e);irBusy(false);}}
 
+
+/* ---------- QC: ตั้งค่าหัวกระดาษเอกสารผลตรวจ (ตามแบรนด์) ---------- */
+let HDRL=null;const HDRI={};
+function hdrLoad(){call('facHdrList').then(r=>{HDRL=r;if(VIEW==='hdr')render();}).catch(e=>{toast(e.message);});}
+function vHdr(){const h=head('หัวกระดาษเอกสาร','หัวกระดาษของเอกสารผลตรวจ (Inspection Report) แยกตามแบรนด์');
+  if(!HDRL){hdrLoad();return h+'<div class="card" style="padding:16px"><div class="note">กำลังโหลด…</div></div>';}
+  setTimeout(hdrThumbs,0);
+  const none=b=>HDRL.def?'ยังไม่มี · ใช้หัวกระดาษกลาง':(/^BG\b|BEDGEAR/i.test(b)?'ยังไม่มี · ใช้หัว Bedgear ในระบบ':'ยังไม่มี · ใช้หัว Lotus ในระบบ');
+  const row=(b,label,fid)=>`<div class="hdr-row"><div><b>${esc(label)}</b>${fid?'':`<div class="note">${b==='*'?'ยังไม่ตั้ง · แบรนด์ที่ไม่มีรูปใช้หัว Lotus / Bedgear ในระบบ':none(b)}</div>`}</div>
+   <div class="hdr-img" data-hb="${esc(b)}" data-fid="${fid?1:''}">${fid?'<span class="note">กำลังโหลด…</span>':'<span class="note">—</span>'}</div>
+   <div class="hdr-act"><label class="btn ${fid?'g ':''}sm" style="cursor:pointer">${fid?'เปลี่ยนรูป':'อัปโหลด'}<input type="file" accept="image/jpeg,image/png" hidden data-b="${esc(b)}" onchange="hdrPick(this)"></label>${fid?`<button type="button" class="btn g sm" data-b="${esc(b)}" onclick="hdrDel(this.dataset.b)">ลบ</button>`:''}</div></div>`;
+  return h+`<div class="card" style="padding:14px 16px">
+   <div class="note">ขนาดแนะนำ <b>2000 × 440 px</b> (สัดส่วนประมาณ 4.5 : 1) · JPG หรือ PNG พื้นหลังสีขาว · ไม่เกิน 3 MB · ใส่โลโก้ สโลแกน ช่องทางติดต่อ และเส้นคั่นด้านล่างไว้ในรูปเลย
+   <br>ตอน QC ออกเอกสาร ระบบเลือกหัวกระดาษตามแบรนด์ของเคสให้อัตโนมัติ · แบรนด์ที่ยังไม่มีรูปใช้ "หัวกระดาษกลาง"${HDRL.online?'':'<br><b>ตัวรันในออฟฟิศ: ดูได้อย่างเดียว · อัปโหลด/ลบได้ที่เว็บออนไลน์</b>'}</div>
+   ${row('*','หัวกระดาษกลาง',HDRL.def)}${HDRL.rows.map(r=>row(r.brand,r.brand,r.fid)).join('')}</div>`;}
+function hdrThumbs(){document.querySelectorAll('.hdr-img[data-fid="1"]').forEach(el=>{const b=el.dataset.hb;
+  const put=src=>{if(el.isConnected)el.innerHTML=src?`<img src="${src}" alt="">`:'<span class="note">เปิดรูปไม่ได้</span>';};
+  if(HDRI[b]!==undefined){put(HDRI[b]);return;}
+  call('facHdrImg',b,true).then(r=>{HDRI[b]=r&&r.b64?'data:'+r.mime+';base64,'+r.b64:'';put(HDRI[b]);}).catch(()=>put(''));});}
+function hdrPick(inp){const f=inp.files&&inp.files[0],b=inp.dataset.b;inp.value='';if(!f)return;
+  if(!/^image\/(jpeg|png)$/.test(f.type))return toast('รองรับเฉพาะ JPG / PNG');
+  const url=URL.createObjectURL(f),im=new Image();
+  im.onload=()=>{const W=im.naturalWidth,H=im.naturalHeight,k=Math.min(1,2000/W),c=document.createElement('canvas');c.width=Math.round(W*k);c.height=Math.round(H*k);
+    const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);
+    const du=c.toDataURL('image/jpeg',.9),r=W/H,warn=[];
+    if(W<1400)warn.push(`ภาพกว้าง ${W} px เล็กกว่าที่แนะนำ (2000 px) อาจไม่คมตอนพิมพ์`);
+    if(r<3.5||r>6)warn.push(`สัดส่วน ${r.toFixed(1)} : 1 ต่างจากที่แนะนำ (4.5 : 1) หัวกระดาษอาจ${r<3.5?'สูงจนดันเนื้อหาลง':'เตี้ยเกินไป'}`);
+    modal(`หัวกระดาษ · ${esc(b==='*'?'หัวกระดาษกลาง':b)}`,`<div class="hdr-prev"><img src="${du}" alt=""></div><div class="note">ขนาด ${W} × ${H} px${k<1?` · ย่อเป็น ${c.width} × ${c.height} px`:''}</div>${warn.map(w=>`<div class="hdr-warn">${esc(w)}</div>`).join('')}`,
+      warn.length?'ใช้รูปนี้ต่อ':'บันทึกหัวกระดาษ',async()=>{await call('facHdrSet',b,'image/jpeg',du.split(',')[1]);HDRI[b]=du;HDRL=null;toast('บันทึกหัวกระดาษแล้ว');render();});};
+  im.onerror=()=>{URL.revokeObjectURL(url);toast('เปิดรูปไม่ได้');};im.src=url;}
+function hdrDel(b){modal('ลบหัวกระดาษ · '+esc(b==='*'?'หัวกระดาษกลาง':b),`<div class="note">${b==='*'?'แบรนด์ที่ไม่มีรูปจะกลับไปใช้หัว Lotus / Bedgear ในระบบ':'แบรนด์นี้จะกลับไปใช้หัวกระดาษกลาง'} · รูปเดิมย้ายไปถังขยะของ Google Drive (กู้คืนได้ 30 วัน)</div>`,
+  'ลบ',async()=>{await call('facHdrDel',b);delete HDRI[b];HDRL=null;toast('ลบหัวกระดาษแล้ว');render();});}
 /* แนบไฟล์เอกสารเอง (แบบเดิม) */
 function actDocIssueFile(key){const c=caseByKey(key);
   modal('ออกเอกสารผลตรวจสอบ · '+esc(c.svo),sub(c)+`<div class="note">แนบไฟล์เอกสารผลตรวจ (PDF หรือรูป) ที่จะส่งให้ลูกค้า</div>`+upBox('ไฟล์เอกสาร',1),
