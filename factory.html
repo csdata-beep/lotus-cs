@@ -790,11 +790,10 @@ function actStart(key){const c=caseByKey(key);
   'รับเข้าซ่อม',async()=>{await doAct(key,'start',{line:$('#ln').value,eval:$('#ev').value},'','',c.svo+' รับเข้าซ่อมแล้ว');});}
 function actFinish(key){const c=caseByKey(key);
   modal('ซ่อมเสร็จ · ตรวจ QC · '+esc(c.svo),sub(c)+`<div class="fld"><label>สิ่งที่ซ่อม</label><textarea id="fx" rows="2" placeholder="เช่น เปลี่ยนสปริงชุดกลาง 12 ตัว"></textarea></div>
-   <div class="fld"><label>รายการตรวจ QC (ติ๊กข้อที่ผ่าน)</label><div class="chk">${B.qc.map((q,i)=>`<label><input type="checkbox" id="q${i}" value="${esc(q)}"> ${esc(q)}</label>`).join('')}</div></div>`+upBox('รูปหลังซ่อม / ผลตรวจ',1)+
+   <div class="fld"><label>รายการตรวจ QC (ติ๊กข้อที่ผ่าน · ไม่บังคับครบทุกข้อ)</label><div class="chk">${B.qc.map((q,i)=>`<label><input type="checkbox" id="q${i}" value="${esc(q)}"> ${esc(q)}</label>`).join('')}</div></div>`+upBox('รูปหลังซ่อม / ผลตรวจ',1)+
    `<div class="fld"><label>ผลการตรวจ</label><select id="qr"><option value="pass">ผ่าน · ส่งคืน CS โรงงาน</option><option value="fail">ไม่ผ่าน · ซ่อมซ้ำ</option></select></div><div class="fld"><label>เหตุผลถ้าไม่ผ่าน</label><textarea id="qn" rows="2"></textarea></div>`,
   'บันทึกผล',async()=>{const items=B.qc.filter((_,i)=>$('#q'+i).checked);const pass=$('#qr').value==='pass';
    if(!PEND.length)throw new Error('แนบรูปหลังซ่อมอย่างน้อย 1 รูป');
-   if(pass&&items.length<B.qc.length)throw new Error('ผ่าน QC ได้เมื่อติ๊กครบทุกข้อ');
    if(!pass&&!$('#qn').value.trim())throw new Error('ใส่เหตุผลที่ไม่ผ่าน');
    await doAct(key,'finish',{pass,items,fix:$('#fx').value,reason:$('#qn').value},pass?'QC':'REPAIR',pass?'หลังซ่อม · QC ผ่าน':'QC ไม่ผ่าน',pass?c.svo+' ผ่าน QC · ขึ้นที่ CS หน้า "รับกลับ"'+(c.docReq?' · อย่าลืมออกเอกสาร':''):c.svo+' ไม่ผ่าน · ยังอยู่ในหน้าที่นอนซ่อม');});}
 /* ---------- เอกสารผลตรวจ (Inspection Report) ----------
