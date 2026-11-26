@@ -49,6 +49,7 @@ main{flex:1;min-width:0;padding-block:20px 48px;padding-left:max(16px,env(safe-a
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);min-width:0}
 .card h3{margin:0 0 10px;font-size:15.5px;font-weight:700}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.qcrow{margin-bottom:16px}.qcrh{display:flex;align-items:center;gap:8px;margin:0 0 8px}.qcrh h3{margin:0;font-size:16px;font-family:var(--f-display)}.qcdot{width:10px;height:10px;border-radius:3px;display:inline-block}
 .tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;cursor:pointer;text-align:left;display:grid;gap:2px;box-shadow:var(--shadow);border-top:4px solid var(--line)}
 .tile:hover{border-color:var(--accent)}
 .tile .l{color:var(--mut);font-size:13px}
@@ -556,6 +557,26 @@ function vDashCS(){const m=M();const t=T0();
       <div class="note" style="margin-top:10px">ที่นอนที่ส่งซ่อมแล้วดูได้ในหน้า "ส่งซ่อม" · รายละเอียดงานซ่อมอยู่ในภาพรวม QC</div></div>
   </div>`+alertCard('CS ต้องตามงาน',alerts);}
 /* ---------- ภาพรวม QC ---------- */
+/* ประเภทสินค้าในโรงงาน: ที่นอน / เตียง / เตียงไฟฟ้า (จาก "ประเภทสินค้า" ใน SVO · ถ้าว่างดูไลน์ซ่อม) */
+const PCATS=['ที่นอน','เตียง','เตียงไฟฟ้า'];
+function pcat(c){const t=String(c.type||'');
+  if(/ไฟฟ้า|รีโมท|electric|adjustable|remote|motor|smart\s*bed/i.test(t))return 'เตียงไฟฟ้า';
+  if(/ที่นอน|mattress|topper|ท็อปเปอร์|หมอน|pillow/i.test(t))return 'ที่นอน';
+  if(/เตียง|bed|base|ฐาน|frame/i.test(t))return 'เตียง';
+  if(/เตียง/.test(c.line||''))return /ไฟฟ้า|electric|adjust/i.test(String(c.model||''))?'เตียงไฟฟ้า':'เตียง';
+  return 'ที่นอน';}
+const PCAT_IC={'ที่นอน':'#1F4E78','เตียง':'#8a5a00','เตียงไฟฟ้า':'#5b3fb3'};
+function qcRow(k,m,t){const f=a=>a.filter(c=>pcat(c)===k);
+  const wait=f(m.wait),rep=f(m.rep),late=f(m.repLate),rw=f(CASES.filter(c=>c.rework&&(c.stage==='REPAIR'||c.stage==='WAIT'))),
+    pass7=f(CASES.filter(c=>c.doneD&&['BACK','READY','OUT'].includes(c.stage)&&dayDiff(c.doneD,t)<7)),doc=f(m.docTodo);
+  return `<div class="qcrow"><div class="qcrh"><span class="qcdot" style="background:${PCAT_IC[k]}"></span><h3>${k}</h3><span class="note">${wait.length+rep.length} หลังอยู่ในงานซ่อม</span></div><div class="tiles">
+    ${tile(wait.length?'warn':'','wait',k+'รอซ่อม',wait.length,'หลัง','CS ส่งมาแล้ว รอรับเข้าซ่อม')}
+    ${tile('info','repair','กำลังซ่อม',rep.length,'หลัง','แยกตามไลน์ซ่อมด้านล่าง')}
+    ${tile(late.length?'bad':'','repair','ค้างซ่อมเกิน '+B.late+' วัน',late.length,'หลัง','นับจากวันที่ส่งซ่อม')}
+    ${tile(rw.length?'bad':'','repair','ซ่อมซ้ำ (ตรวจไม่ผ่าน)',rw.length,'หลัง','กำลังแก้ไขรอบใหม่')}
+    ${tile('ok','repair','ตรวจผ่าน 7 วันล่าสุด',pass7.length,'หลัง','ส่งคืน CS โรงงานแล้ว')}
+    ${tile(doc.length?'warn':'','doc','รอออกเอกสารตรวจสอบ',doc.length,'ฉบับ','ลูกค้าขอเอกสารผลตรวจ')}
+  </div></div>`;}
 function vDashQC(){const m=M();const t=T0();
   const pass7=CASES.filter(c=>c.doneD&&['BACK','READY','OUT'].includes(c.stage)&&dayDiff(c.doneD,t)<7);
   const rw=CASES.filter(c=>c.rework&&(c.stage==='REPAIR'||c.stage==='WAIT'));
@@ -567,14 +588,7 @@ function vDashQC(){const m=M();const t=T0();
     rw.map(c=>({c,lv:'p-bad',tag:'ซ่อมซ้ำ ×'+c.rework,why:ST(c.stage).t})),
     m.docTodo.map(c=>({c,lv:'p-doc',tag:'รอออกเอกสาร',why:`ตรวจผ่าน ${fd(c.doneD)} · ลูกค้าขอเอกสารผลตรวจสอบ`})));
   return head('ภาพรวม QC','รับเข้าซ่อม · ซ่อม · ตรวจ QC · ออกเอกสารผลตรวจ')+
-  `<div class="tiles">
-    ${tile(m.wait.length?'warn':'','wait','ที่นอนรอซ่อม',m.wait.length,'หลัง','CS ส่งมาแล้ว รอรับเข้าซ่อม')}
-    ${tile('info','repair','กำลังซ่อม',m.rep.length,'หลัง','แยกตามไลน์ซ่อมด้านล่าง')}
-    ${tile(m.repLate.length?'bad':'','repair','ค้างซ่อมเกิน '+B.late+' วัน',m.repLate.length,'หลัง','นับจากวันที่ส่งซ่อม')}
-    ${tile(rw.length?'bad':'','repair','ซ่อมซ้ำ (ตรวจไม่ผ่าน)',rw.length,'หลัง','กำลังแก้ไขรอบใหม่')}
-    ${tile('ok','repair','ตรวจผ่าน 7 วันล่าสุด',pass7.length,'หลัง','ส่งคืน CS โรงงานแล้ว')}
-    ${tile(m.docTodo.length?'warn':'','doc','รอออกเอกสารตรวจสอบ',m.docTodo.length,'ฉบับ','ลูกค้าขอเอกสารผลตรวจ')}
-  </div>
+  `${PCATS.map(k=>qcRow(k,m,t)).join('')}
   <div class="g2">
     <div class="card"><h3>กำลังซ่อม แยกตามไลน์ซ่อม</h3>${hbars(lines)}</div>
     <div class="card"><h3>อายุงานซ่อม (รอซ่อม + กำลังซ่อม)</h3>${hbars(buckets)}<div class="note" style="margin-top:10px">นับวันจาก "วันที่ส่งซ่อม" · เกณฑ์เดียวกับเว็บหลัก</div></div>
